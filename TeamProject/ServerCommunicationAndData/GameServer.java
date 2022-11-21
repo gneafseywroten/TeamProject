@@ -76,6 +76,7 @@ public class GameServer extends AbstractServer
       {
         result = "LoginSuccessful";
       }
+      
       else
       {
         result =("The username and password are incorrect.");
