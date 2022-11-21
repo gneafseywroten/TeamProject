@@ -84,7 +84,6 @@ public class GameServer extends AbstractServer
       // Send the result to the client.
       try
       {
-    	  
         arg1.sendToClient(r);
       }
       catch (IOException e)

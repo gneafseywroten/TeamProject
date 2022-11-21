@@ -11,6 +11,7 @@ public class User implements Serializable
   {
     return username;
   }
+  
   public String getPassword()
   {
     return password;
