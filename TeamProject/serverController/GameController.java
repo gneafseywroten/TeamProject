@@ -3,6 +3,7 @@ package serverController;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -32,6 +33,9 @@ public class GameController implements ActionListener {
 	private int shipLength;
 	private int shipIndex;
 	private int shipPlaced[] = {0,0,0,0,0};
+	private int coord_index;
+	private List<Integer> coordsSelected = new ArrayList<>();
+	private List<Integer> coordsPlaced = new ArrayList<>();
 	
 	public GameController(GameData data, GameBoard gb) {
 		this.data = data;
@@ -98,10 +102,12 @@ public class GameController implements ActionListener {
 		placementValid = data.getPlacementValid();
 		
 		//int shipLength = 1;
-		//SingleCoordinate coordinate = new SingleCoordinate(i,j,false,'e');
-		//coordinate.setButton(playerGridButton[buttonRow][buttonCol]);
+		coord_index = (buttonRow * M_GRID_SIZE) + buttonCol;
+		SingleCoordinate coordinate = new SingleCoordinate(buttonRow,buttonCol,false,'e');
+		coordinate.setButton(playerGridButton[buttonRow][buttonCol]);
+		data.addCoordinate(coord_index, coordinate);
 		//coords.add(coordinate);
-		//data.addCoordinate(coord_index, coordinate);
+
 		playerGridButton[buttonRow][buttonCol].setFont(font);
 		playerGridButton[buttonRow][buttonCol].setBackground(new Color(131, 209, 232));
 		playerGridButton[buttonRow][buttonCol].setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
@@ -201,9 +207,13 @@ public class GameController implements ActionListener {
 //					    			button.setBackground(Color.GREEN);
 //					    			button.setBorder(new LineBorder(Color.BLACK));
 							    	playerGridButton[buttonRow][buttonCol+index].setBackground(Color.GREEN);
-							    	playerGridButton[buttonRow][buttonCol+index].setText("");
+							    	playerGridButton[buttonRow][buttonCol+index].setBorder(new LineBorder(Color.BLACK));
+							    	//playerGridButton[buttonRow][buttonCol+index].setText("");
+							    	coord_index = (buttonRow * M_GRID_SIZE) + (buttonCol+index);
+							    	coordsSelected.add(coord_index);
 							    	//playerGridButton[buttonRow][buttonCol+index].setBorder(new LineBorder(Color.BLACK));
 					    		}
+					    		//System.out.println("List: " + coordsSelected);
 					    		for (int i = 0; i < M_GRID_SIZE; i++) {
 									for (int j = 0; j < M_GRID_SIZE; j++) {
 										playerGridButton[i][j].setEnabled(false);
@@ -229,7 +239,11 @@ public class GameController implements ActionListener {
 //					    			button.setBorder(new LineBorder(Color.BLACK));
 							    	playerGridButton[buttonRow+index][buttonCol].setBackground(Color.GREEN);
 							    	playerGridButton[buttonRow+index][buttonCol].setBorder(new LineBorder(Color.BLACK));
+							    	//playerGridButton[buttonRow+index][buttonCol].setText("");
+							    	coord_index = ((buttonRow+index) * M_GRID_SIZE) + buttonCol;
+							    	coordsSelected.add(coord_index);
 					    		}
+					    		//System.out.println("List: " + coordsSelected);
 					    		for (int i = 0; i < M_GRID_SIZE; i++) {
 									for (int j = 0; j < M_GRID_SIZE; j++) {
 										playerGridButton[i][j].setEnabled(false);
@@ -431,12 +445,57 @@ public class GameController implements ActionListener {
 					}
 					gameBoard.setPlayerMessage(message);
 				}
+				int selectedLength = coordsSelected.size();
+				int[] select_arr;
+				select_arr = new int[selectedLength];
+				for (int i = 0; i < selectedLength; i++) {
+					select_arr[i] = coordsSelected.get(i);
+					coordsPlaced.add(select_arr[i]);
+				}
+				int placedLength = coordsPlaced.size();
+				int[] place_arr;
+				place_arr = new int[placedLength];
+				for (int i = 0; i < placedLength; i++) {
+					place_arr[i] = coordsPlaced.get(i);
+				}
 				
+				for (int i = 0; i < M_GRID_SIZE; i++) {
+					for (int j = 0; j < M_GRID_SIZE; j++) {
+						playerGridButton[i][j].setEnabled(true);
+					}
+				}
+
+				int temp;
+				for (int i = 0; i < selectedLength; i++) {
+					temp = select_arr[i];
+					for (int j = 0; j < M_GRID_SIZE; j++) {
+						for (int k = 0; k < M_GRID_SIZE; k++) {
+							coord_index = (j * M_GRID_SIZE) + k;
+							if (temp == coord_index) {
+								playerGridButton[j][k].setText("o");
+								playerGridButton[j][k].setEnabled(false);
+							}
+						}
+					}
+				}
+				for (int i = 0; i < placedLength; i++) {
+					temp = place_arr[i];
+					for (int j = 0; j < M_GRID_SIZE; j++) {
+						for (int k = 0; k < M_GRID_SIZE; k++) {
+							coord_index = (j * M_GRID_SIZE) + k;
+							if (temp == coord_index) {
+								playerGridButton[j][k].setText("o");
+								playerGridButton[j][k].setEnabled(false);
+							}
+						}
+					}
+				}
 				for (int i = 0; i < M_GRID_SIZE; i++) {
 					for (int j = 0; j < M_GRID_SIZE; j++) {
 						playerGridButton[i][j].setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
 					}
 				}
+				coordsSelected.clear();
 				shipSelected = false;
 				data.setShipSelected(shipSelected);
 				//coordSelected = false;
@@ -458,14 +517,39 @@ public class GameController implements ActionListener {
 						shipButton[i].setEnabled(true);
 					}
 				}
+				int listLength = coordsPlaced.size();
+				int[] temp_arr;
+				temp_arr = new int[listLength];
+				for (int i = 0; i < listLength; i++) {
+					temp_arr[i] = coordsPlaced.get(i);
+				}
+				
+				for (int i = 0; i < M_GRID_SIZE; i++) {
+					for (int j = 0; j < M_GRID_SIZE; j++) {
+						playerGridButton[i][j].setEnabled(true);
+					}
+				}
+
+				int temp2;
+				for (int i = 0; i < listLength; i++) {
+					temp2 = temp_arr[i];
+					for (int j = 0; j < M_GRID_SIZE; j++) {
+						for (int k = 0; k < M_GRID_SIZE; k++) {
+							coord_index = (j * M_GRID_SIZE) + k;
+							if (temp2 == coord_index) {
+								playerGridButton[j][k].setText("o");
+								playerGridButton[j][k].setEnabled(false);
+							}
+						}
+					}
+				}
 				
 				for (int i = 0; i < M_GRID_SIZE; i++) {
 					for (int j = 0; j < M_GRID_SIZE; j++) {
 						playerGridButton[i][j].setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
-						playerGridButton[i][j].setEnabled(true);
 					}
 				}
-				
+				coordsSelected.clear();
 				gameBoard.setPlayerMessage(" ");
 				shipSelected = false;
 				data.setShipSelected(shipSelected);
