@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import ClientInterfaceTemplate.ChatClient;
+import ClientInterfaceTemplate.GameClient;
 import ClientInterfaceTemplate.ClientGUI;
 import ClientInterfaceTemplate.ContactsPanel;
 import ClientInterfaceTemplate.CreateAccountControl;
@@ -65,7 +65,7 @@ public class ClientGUI extends JFrame
     JPanel view1 = new InitialPanel(ic);
     JPanel view2 = new LoginPanel(lc);
     JPanel view3 = new CreateAccountPanel(cac);
-    JPanel view4 = new ContactsPanel();
+    JPanel view4 = new BattleshipBoardPanel();
     
     // Add the views to the card layout container.
     container.add(view1, "1");
