@@ -10,7 +10,7 @@ import javax.swing.JScrollPane;
 public class TotalWinsPanel extends JPanel {
 
 	/**
-	 * Create the panel.
+	 * Create the total wins panel.
 	 */
 	public TotalWinsPanel() {
 		setLayout(null);

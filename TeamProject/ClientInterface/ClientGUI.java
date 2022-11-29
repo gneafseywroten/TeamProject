@@ -45,7 +45,7 @@ public class ClientGUI extends JFrame
     
     
     
-    // Set the title and default close operation.
+    // Set the title
     this.setTitle("Game Client");
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
