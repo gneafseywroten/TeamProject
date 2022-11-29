@@ -51,6 +51,8 @@ public class DatabaseFile
     String row = new String();
     ResultSetMetaData rmd = rs.getMetaData();
     int no_columns = rmd.getColumnCount();
+  
+    
     
     while(rs.next())
     {

@@ -69,10 +69,12 @@ public class GameServer extends AbstractServer
 	LoginData data = (LoginData)arg0;
       Object result;
       String q = "select * from Users table";
+      Object win;
+      
       ArrayList<String> r = database.query(q);
       for (String row : r)
       {
-      if (row.equals(data.getUsername() + data.getPassword() ))
+      if (row.equals(data.getUsername() + data.getPassword() + data.getNum_Win()))
       {
         result = "LoginSuccessful";
       }
