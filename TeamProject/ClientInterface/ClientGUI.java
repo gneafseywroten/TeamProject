@@ -1,7 +1,7 @@
 package ClientInterface;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
+import java.awt.GameLayout;
 import java.awt.EventQueue;
 import java.awt.GridBagLayout;
 import java.io.IOException;
@@ -10,15 +10,18 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import ClientInterfaceTemplate.GameClient;
-import ClientInterfaceTemplate.ClientGUI;
-import ClientInterfaceTemplate.ContactsPanel;
-import ClientInterfaceTemplate.CreateAccountControl;
-import ClientInterfaceTemplate.CreateAccountPanel;
-import ClientInterfaceTemplate.InitialControl;
-import ClientInterfaceTemplate.InitialPanel;
-import ClientInterfaceTemplate.LoginControl;
-import ClientInterfaceTemplate.LoginPanel;
+import ClientInterface.GameClient;
+import ClientInterface.ClientGUI;
+import ClientInterface.GamePanel;
+import ClientInterface.CreateAccountControl;
+import ClientInterface.CreateAccountPanel;
+import ClientInterface.InitialControl;
+import ClientInterface.InitialPanel;
+import ClientInterface.LoginControl;
+import ClientInterface.TotalWinsPanel;
+import ClientInterface.ReadyUpPanel;
+import ClientInterface.StartJoinGamePanel;
+import ClientInterface.DifficultyPanel;
 
 public class ClientGUI extends JFrame
 {
@@ -43,12 +46,12 @@ public class ClientGUI extends JFrame
     
     
     // Set the title and default close operation.
-    this.setTitle("Chat Client");
+    this.setTitle("Game Client");
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
     // Create the card layout container.
-    CardLayout cardLayout = new CardLayout();
-    JPanel container = new JPanel(cardLayout);
+    GameLayout gameLayout = new GameLayout();
+    JPanel container = new JPanel(gameLayout);
     
     //Create the Controllers next
     //Next, create the Controllers
@@ -66,16 +69,22 @@ public class ClientGUI extends JFrame
     JPanel view2 = new LoginPanel(lc);
     JPanel view3 = new CreateAccountPanel(cac);
     JPanel view4 = new BattleshipBoardPanel();
+    JPanel view5 = new DifficultyPanel();
+    JPanel view6 = new ReadyUpPanel();
+    JPanel view7 = new TotalWinsPanel();
     
     // Add the views to the card layout container.
     container.add(view1, "1");
     container.add(view2, "2");
     container.add(view3, "3");
     container.add(view4, "4");
+    container.add(view5, "5");
+    container.add(view6, "6");
+    container.add(view7, "7");
    
     
     // Show the initial view in the card layout.
-    cardLayout.show(container, "1");
+    gameLayout.show(container, "1");
     
     // Add the card layout container to the JFrame.
     // GridBagLayout makes the container stay centered in the window.
