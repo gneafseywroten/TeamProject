@@ -8,5 +8,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/miaca/git/TeamProject/TeamProject/mysql-connector-java-5.1.40-bin.jar"/>
 	<classpathentry kind="lib" path="C:/Users/miaca/git/TeamProject/TeamProject/ocsf.jar"/>
+	<classpathentry kind="lib" path="C:/Users/gneaf/papyrus/SWE_Lectures/Database/mysql-connector-java-5.1.40-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Users/gneaf/papyrus/SWE_Lectures/Database/ocsf.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

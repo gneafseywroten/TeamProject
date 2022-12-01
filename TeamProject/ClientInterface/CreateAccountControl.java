@@ -2,7 +2,7 @@ package ClientInterface;
 
 import java.io.Serializable;
 
-public class CreateAccountData implements Serializable 
+public class CreateAccountControl implements Serializable 
 {
   // Private data fields for the username and password.
   private String username;
@@ -29,7 +29,7 @@ public class CreateAccountData implements Serializable
   }
   
   // Constructor that initializes the username and password.
-  public CreateAccountData(String username, String password)
+  public CreateAccountControl(String username, String password)
   {
     setUsername(username);
     setPassword(password);
