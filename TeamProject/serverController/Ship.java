@@ -3,19 +3,18 @@ package serverController;
 import java.util.*;
 
 public abstract class Ship {
-	private List<SingleCoordinate> NewShip;
-	protected String shipType;
-	protected boolean occupied = true;
-	protected int length = 1;
+	private String shipType;
+	private char status;
+	private int length = 1;
+	private int intactParts;
+	private boolean placed;
+	private boolean sunk;
 	
-	public Ship(List<SingleCoordinate> newShip, String shipType) {
-		NewShip = newShip;
+	public Ship(int length, String shipType) {
 		this.shipType = shipType;
-		this.occupied = true;
-	}
-	
-	public List<SingleCoordinate> getNewShip() {
-		return NewShip;
+		this.length = length;
+		this.intactParts = length;
+		this.sunk = false;
 	}
 	
 	public String getType() {
@@ -26,8 +25,23 @@ public abstract class Ship {
 		return length;
 	}
 	
-	public boolean isOccupied() {
-		return true;
+	public void hit() {
+		intactParts--;
+		if (intactParts == 0)
+			this.sunk = true;
 	}
+	
+	public boolean sunk() {
+		return sunk;
+	}
+	
+	public void setPlaced(boolean placed) {
+		this.placed = placed;
+	}
+	
+	public boolean isPlaced() {
+		return placed;
+	}
+
 
 }

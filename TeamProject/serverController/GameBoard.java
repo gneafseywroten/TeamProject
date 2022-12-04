@@ -14,7 +14,6 @@ public class GameBoard extends JPanel {
 	public JPanel container;
 	private int[] shipPlaced = {0,0,0,0,0};
 	private int shipIndex;
-	//private int coordIndex;
 	private String[] rows = {"A","B","C","D","E","F","G","H","I","J"};
 	private String[] cols = {"1","2","3","4","5","6","7","8","9","10"};
 	private final int M_GRID_SIZE = 10;
@@ -24,6 +23,10 @@ public class GameBoard extends JPanel {
 	private JButton enemyGridButton[][] = new JButton[M_GRID_SIZE][M_GRID_SIZE];
 	private JButton shipButton[] = new JButton[5];
  	private JButton button = new JButton();
+ 	private JButton orient = new JButton();
+ 	private JButton place = new JButton();
+ 	private JButton cancelPlace = new JButton();
+ 	private JButton beginBattle = new JButton();
 	//private SingleCoordinate coordinate;
 	private ArrayList<SingleCoordinate> coords;
 	private final int ST_SIZE = 45;
@@ -49,6 +52,7 @@ public class GameBoard extends JPanel {
 	private int cruCoords[] = {0,0,0};
 	private int batCoords[] = {0,0,0,0};
 	private int carCoords[] = {0,0,0,0,0};
+	private int coord_index;
 	//private GameGrid oceanGrid;
 	//private GameGrid targetGrid;
 	private GameController gc;
@@ -95,22 +99,6 @@ public class GameBoard extends JPanel {
 	}
 	
 	public void buildPlayerGrid(JPanel grid, int gridSide) {
-//		selection = new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				gc.selectCoordinate(e);
-//				char row = gc.getRow();
-//				int col = gc.getCol();
-//				
-//				
-//				String message = "You have selected coordinate "+row+"-"+col;
-//				//String message = "You have selected a coordinate";
-//				if (gridSide == 1)
-//					setPlayerMessage(message);
-//				if (gridSide == 2)
-//					setEnemyMessage(message);
-//			}
-//		};
-		
 		grid.setLayout(new GridLayout(11, 11, 0, 0));
 		grid.setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
 		
@@ -146,9 +134,9 @@ public class GameBoard extends JPanel {
 					grid.add(button);
 				}
 				else {
-					int coord_index = (buttonRow * M_GRID_SIZE) + buttonCol;
+					coord_index = (buttonRow * M_GRID_SIZE) + buttonCol;
 					playerGridButton[buttonRow][buttonCol] = new JButton("~");
-					playerGridButton[buttonRow][buttonCol] = gc.setGridButton(buttonRow, buttonCol);
+					playerGridButton[buttonRow][buttonCol] = gc.setPlayerGridButton(buttonRow, buttonCol);
 					playerGridButton[buttonRow][buttonCol].setPreferredSize(new Dimension(ST_SIZE, ST_SIZE));
 					grid.add(playerGridButton[buttonRow][buttonCol]);
 				}
@@ -157,21 +145,6 @@ public class GameBoard extends JPanel {
 	}
 	
 	public void buildEnemyGrid (JPanel grid, int gridSide) {
-//		selection = new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				gc.selectCoordinate(e);
-//				char row = gc.getRow();
-//				int col = gc.getCol();
-//				
-//				
-//				String message = "You have selected coordinate "+row+"-"+col;
-//				//String message = "You have selected a coordinate";
-//				if (gridSide == 1)
-//					setPlayerMessage(message);
-//				if (gridSide == 2)
-//					setEnemyMessage(message);
-//			}
-//		};
 		
 		grid.setLayout(new GridLayout(11, 11, 0, 0));
 		grid.setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
@@ -208,15 +181,9 @@ public class GameBoard extends JPanel {
 					grid.add(button);
 				}
 				else {
-					enemyGridButton[buttonRow][buttonCol] = new JButton("~");
-					enemyGridButton[buttonRow][buttonCol].setFont(font);
-					SingleCoordinate coordinate = new SingleCoordinate(i,j,false,'e');
-					coordinate.setButton(enemyGridButton[buttonRow][buttonCol]);
-					//coords.add(coordinate);
-					enemyGridButton[buttonRow][buttonCol].setBackground(new Color(131, 209, 232));
-					enemyGridButton[buttonRow][buttonCol].setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
-					enemyGridButton[buttonRow][buttonCol].setCursor(new Cursor(Cursor.HAND_CURSOR));
-					//enemyGridButton[buttonRow][buttonCol].addActionListener(selection);
+					coord_index = (buttonRow * M_GRID_SIZE) + buttonCol;
+					enemyGridButton[buttonRow][buttonCol] = new JButton("");
+					enemyGridButton[buttonRow][buttonCol] = gc.setEnemyGridButton(buttonRow, buttonCol);
 					enemyGridButton[buttonRow][buttonCol].setPreferredSize(new Dimension(ST_SIZE, ST_SIZE));
 					grid.add(enemyGridButton[buttonRow][buttonCol]);
 				}
@@ -225,10 +192,11 @@ public class GameBoard extends JPanel {
 	}
 	
 	public void buildPlaceCommands(JPanel placeCommands) {
-		placeCommands.setLayout(new GridLayout(2, 1, 0, 25));
+		placeCommands.setLayout(new GridLayout(3, 1, 0, 25));
 		
 		JPanel shipButtons = new JPanel();
 		JPanel placeButtons = new JPanel();
+		JPanel startOrExit = new JPanel();
 		
 		//Build shipButtons panel
 		shipButtons.setLayout(new GridLayout(5, 1, 0, 5));
@@ -239,10 +207,10 @@ public class GameBoard extends JPanel {
 					shipButton[i] = new JButton("Destroyer (2)");
 					break;
 				case 1:
-					shipButton[i] = new JButton("Cruiser (3)");
+					shipButton[i] = new JButton("Submarine (3)");
 					break;
 				case 2:
-					shipButton[i] = new JButton("Submarine (3)");
+					shipButton[i] = new JButton("Cruiser (3)");
 					break;
 				case 3:
 					shipButton[i] = new JButton("Battleship (4)");
@@ -256,53 +224,39 @@ public class GameBoard extends JPanel {
 		}
 		
 		
-//		JButton destroyerButton = new JButton("Destroyer (2)");
-//		destroyerButton.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				gc.selectShip(e);
-//				
-//				String message = "You have selected the Destroyer";
-//				setPlayerMessage(message);
-//				
-//			}
-//		});
-//		shipButtons.add(destroyerButton);
-//		
-//		
-//		JButton cruiserButton = new JButton("Cruiser (3)");
-//		shipButtons.add(cruiserButton);
-//		
-//		JButton submarineButton = new JButton("Submarine (3)");
-//		shipButtons.add(submarineButton);
-//		
-//		JButton bShipButton = new JButton("Battleship (4)");
-//		shipButtons.add(bShipButton);
-//		
-//		JButton carrierButton = new JButton("Carrier (5)");
-//		shipButtons.add(carrierButton);
-		
-		
 		//Build placeButtons panel
 		placeButtons.setLayout(new GridLayout(3, 1, 0, 10));
 		placeButtons.setPreferredSize(new Dimension(100,100));
 		
-		JButton orient = new JButton("Set Vertical");
+		orient = new JButton("Set Vertical");
 		orient = gc.setOrientButton(orient);
 		orient.setPreferredSize(new Dimension(10, 10));
 		placeButtons.add(orient);
 		
-		JButton place = new JButton("Place Ship");
+		place = new JButton("Place Ship");
 		place = gc.setPlaceButton(place);
 		place.setPreferredSize(new Dimension(10, 10));
 		placeButtons.add(place);
 		
-		JButton cancelPlace = new JButton("Cancel");
+		cancelPlace = new JButton("Cancel");
 		cancelPlace = gc.setCancelPlaceButton(cancelPlace);
 		cancelPlace.setPreferredSize(new Dimension(10, 10));
 		placeButtons.add(cancelPlace);
 		
+		//Build startOrExit panel
+		startOrExit.setLayout(new GridLayout(2, 1, 0, 10));
+		startOrExit.setPreferredSize(new Dimension(100,100));
+		
+		beginBattle = new JButton("BATTLE!");
+		beginBattle = gc.setBeginButton(beginBattle);
+		startOrExit.add(beginBattle);
+		
+		JButton exitGame = new JButton("Exit Game");
+		startOrExit.add(exitGame);
+		
 		placeCommands.add(shipButtons);
 		placeCommands.add(placeButtons);
+		placeCommands.add(startOrExit);
 	}
 	
 	public void buildPlayerSide(JPanel ps) {
@@ -351,8 +305,8 @@ public class GameBoard extends JPanel {
 		targetStatus.setLayout(new BoxLayout(targetStatus, BoxLayout.Y_AXIS));
 		
 		enemyStatus = new JLabel(" ");
-		JLabel enemyShipsAfloat = new JLabel("Enemy Ships Afloat: ");
-		JLabel enemyShipsSunk = new JLabel("Enemy Ships Sunk: ");
+		JLabel enemyShipsAfloat = new JLabel("  ");
+		JLabel enemyShipsSunk = new JLabel("  ");
 		
 		targetStatus.add(enemyStatus);
 		targetStatus.add(enemyShipsAfloat);
@@ -398,5 +352,6 @@ public class GameBoard extends JPanel {
 		
 
 	}
+
 
 }
