@@ -3,6 +3,9 @@ package ClientInterface;
 import java.awt.*;
 import javax.swing.*;
 
+import java.awt.*;
+import javax.swing.*;
+
 public class LoginPanel extends JPanel {
 	private JTextField usernameField;
 	  private JPasswordField passwordField;
@@ -57,4 +60,5 @@ public class LoginPanel extends JPanel {
 		  System.out.println(error);
 		  errorLabel.setText(error);
 	  }
+
 }

@@ -1,10 +1,11 @@
 package ClientInterface;
 
 import java.awt.*;
-import javax.swing.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 public class InitialControl implements ActionListener {
+	
 private JPanel container;
 	
 	public InitialControl(JPanel container) {
@@ -26,4 +27,5 @@ private JPanel container;
 			cardLayout.show(container, "3");
 		}
 	}
+
 }

@@ -4,6 +4,11 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import ClientCommunication.GameClient;
+import serverController.GameController;
+import serverController.GameData;
+import serverController.SingleCoordinate;
+
 import java.awt.event.*;
 import java.util.*;
 
@@ -14,17 +19,20 @@ public class BattleshipBoardPanel extends JPanel {
 	public JPanel container;
 	private int[] shipPlaced = {0,0,0,0,0};
 	private int shipIndex;
-	//private int coordIndex;
 	private String[] rows = {"A","B","C","D","E","F","G","H","I","J"};
 	private String[] cols = {"1","2","3","4","5","6","7","8","9","10"};
 	private final int M_GRID_SIZE = 10;
 	private final int M_PLUS_ONE = 11;
+	private int coord_index;
 	private String coordName = new String();
 	private JButton playerGridButton[][] = new JButton[M_GRID_SIZE][M_GRID_SIZE];
 	private JButton enemyGridButton[][] = new JButton[M_GRID_SIZE][M_GRID_SIZE];
 	private JButton shipButton[] = new JButton[5];
  	private JButton button = new JButton();
-	//private SingleCoordinate coordinate;
+ 	private JButton orient = new JButton();
+ 	private JButton place = new JButton();
+ 	private JButton cancelPlace = new JButton();
+ 	private JButton beginBattle = new JButton();
 	private ArrayList<SingleCoordinate> coords;
 	private final int ST_SIZE = 45;
 	private JPanel oceanGrid;
@@ -33,41 +41,16 @@ public class BattleshipBoardPanel extends JPanel {
 	private JPanel enemySide;
 	private JPanel placeCommands;
 	private JPanel fireButtons;
-	private ActionListener selection;
-	private boolean shipSelected;
-	private boolean placementValid = false;
-	private boolean coordSelected = false;
-	private boolean horizontal = true;
-	private boolean desPlaced = false;
-	private boolean subPlaced = false;
-	private boolean cruPlaced = false;
-	private boolean batPlaced = false;
-	private boolean carPlaced = false;
-	private int shipLength = 1;
-	private int desCoords[] = {0,0};
-	private int subCoords[] = {0,0,0};
-	private int cruCoords[] = {0,0,0};
-	private int batCoords[] = {0,0,0,0};
-	private int carCoords[] = {0,0,0,0,0};
-	//private GameGrid oceanGrid;
-	//private GameGrid targetGrid;
-	private GameController gc;
-	private GameData data;
+	private BattleshipBoardController gc;
+	private BattleshipBoardData data;
+	private GameClient client;
 	
-	public GameBoard(GameData gameData) {
+	public BattleshipBoardPanel(JPanel container, GameClient client, BattleshipBoardData gameData) {
+		this.container = container;
+		this.client = client;
 		this.data = gameData;
-		//Create the controller
-		//this.gc = gc;
-		//gc = new GameController();
-		//data = new GameData();
-		
 		oceanGrid = new JPanel();
 		targetGrid = new JPanel();
-		//gc = getGameController();
-		//oceanGrid = new GameGrid();
-		//targetGrid = new GameGrid();
-		//buildBoard();
-		//gc = getGameController();
 	}
 	
 	public void buildBoard() {
@@ -82,11 +65,6 @@ public class BattleshipBoardPanel extends JPanel {
 		buildFireButtons(fireButtons);
 		buildEnemySide(enemySide);
 		
-		//JLabel invisibleLabel = new JLabel("                      ");
-		//invisibleLabel.setBorder(BorderFactory.createLineBorder(Color.black));
-		//invisibleLabel.setVisible(true);
-		//invisibleLabel.setOpaque(false);
-		
 		this.add(placeCommands);
 		this.add(playerSide);
 		this.add(fireButtons);
@@ -95,22 +73,6 @@ public class BattleshipBoardPanel extends JPanel {
 	}
 	
 	public void buildPlayerGrid(JPanel grid, int gridSide) {
-//		selection = new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				gc.selectCoordinate(e);
-//				char row = gc.getRow();
-//				int col = gc.getCol();
-//				
-//				
-//				String message = "You have selected coordinate "+row+"-"+col;
-//				//String message = "You have selected a coordinate";
-//				if (gridSide == 1)
-//					setPlayerMessage(message);
-//				if (gridSide == 2)
-//					setEnemyMessage(message);
-//			}
-//		};
-		
 		grid.setLayout(new GridLayout(11, 11, 0, 0));
 		grid.setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
 		
@@ -146,9 +108,9 @@ public class BattleshipBoardPanel extends JPanel {
 					grid.add(button);
 				}
 				else {
-					int coord_index = (buttonRow * M_GRID_SIZE) + buttonCol;
+					coord_index = (buttonRow * M_GRID_SIZE) + buttonCol;
 					playerGridButton[buttonRow][buttonCol] = new JButton("~");
-					playerGridButton[buttonRow][buttonCol] = gc.setGridButton(buttonRow, buttonCol);
+					playerGridButton[buttonRow][buttonCol] = gc.setPlayerGridButton(buttonRow, buttonCol);
 					playerGridButton[buttonRow][buttonCol].setPreferredSize(new Dimension(ST_SIZE, ST_SIZE));
 					grid.add(playerGridButton[buttonRow][buttonCol]);
 				}
@@ -157,21 +119,6 @@ public class BattleshipBoardPanel extends JPanel {
 	}
 	
 	public void buildEnemyGrid (JPanel grid, int gridSide) {
-//		selection = new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				gc.selectCoordinate(e);
-//				char row = gc.getRow();
-//				int col = gc.getCol();
-//				
-//				
-//				String message = "You have selected coordinate "+row+"-"+col;
-//				//String message = "You have selected a coordinate";
-//				if (gridSide == 1)
-//					setPlayerMessage(message);
-//				if (gridSide == 2)
-//					setEnemyMessage(message);
-//			}
-//		};
 		
 		grid.setLayout(new GridLayout(11, 11, 0, 0));
 		grid.setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
@@ -208,15 +155,9 @@ public class BattleshipBoardPanel extends JPanel {
 					grid.add(button);
 				}
 				else {
-					enemyGridButton[buttonRow][buttonCol] = new JButton("~");
-					enemyGridButton[buttonRow][buttonCol].setFont(font);
-					SingleCoordinate coordinate = new SingleCoordinate(i,j,false,'e');
-					coordinate.setButton(enemyGridButton[buttonRow][buttonCol]);
-					//coords.add(coordinate);
-					enemyGridButton[buttonRow][buttonCol].setBackground(new Color(131, 209, 232));
-					enemyGridButton[buttonRow][buttonCol].setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
-					enemyGridButton[buttonRow][buttonCol].setCursor(new Cursor(Cursor.HAND_CURSOR));
-					//enemyGridButton[buttonRow][buttonCol].addActionListener(selection);
+					coord_index = (buttonRow * M_GRID_SIZE) + buttonCol;
+					enemyGridButton[buttonRow][buttonCol] = new JButton("");
+					enemyGridButton[buttonRow][buttonCol] = gc.setEnemyGridButton(buttonRow, buttonCol);
 					enemyGridButton[buttonRow][buttonCol].setPreferredSize(new Dimension(ST_SIZE, ST_SIZE));
 					grid.add(enemyGridButton[buttonRow][buttonCol]);
 				}
@@ -225,10 +166,11 @@ public class BattleshipBoardPanel extends JPanel {
 	}
 	
 	public void buildPlaceCommands(JPanel placeCommands) {
-		placeCommands.setLayout(new GridLayout(2, 1, 0, 25));
+		placeCommands.setLayout(new GridLayout(3, 1, 0, 25));
 		
 		JPanel shipButtons = new JPanel();
 		JPanel placeButtons = new JPanel();
+		JPanel startOrExit = new JPanel();
 		
 		//Build shipButtons panel
 		shipButtons.setLayout(new GridLayout(5, 1, 0, 5));
@@ -239,10 +181,10 @@ public class BattleshipBoardPanel extends JPanel {
 					shipButton[i] = new JButton("Destroyer (2)");
 					break;
 				case 1:
-					shipButton[i] = new JButton("Cruiser (3)");
+					shipButton[i] = new JButton("Submarine (3)");
 					break;
 				case 2:
-					shipButton[i] = new JButton("Submarine (3)");
+					shipButton[i] = new JButton("Cruiser (3)");
 					break;
 				case 3:
 					shipButton[i] = new JButton("Battleship (4)");
@@ -256,53 +198,39 @@ public class BattleshipBoardPanel extends JPanel {
 		}
 		
 		
-//		JButton destroyerButton = new JButton("Destroyer (2)");
-//		destroyerButton.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				gc.selectShip(e);
-//				
-//				String message = "You have selected the Destroyer";
-//				setPlayerMessage(message);
-//				
-//			}
-//		});
-//		shipButtons.add(destroyerButton);
-//		
-//		
-//		JButton cruiserButton = new JButton("Cruiser (3)");
-//		shipButtons.add(cruiserButton);
-//		
-//		JButton submarineButton = new JButton("Submarine (3)");
-//		shipButtons.add(submarineButton);
-//		
-//		JButton bShipButton = new JButton("Battleship (4)");
-//		shipButtons.add(bShipButton);
-//		
-//		JButton carrierButton = new JButton("Carrier (5)");
-//		shipButtons.add(carrierButton);
-		
-		
 		//Build placeButtons panel
 		placeButtons.setLayout(new GridLayout(3, 1, 0, 10));
 		placeButtons.setPreferredSize(new Dimension(100,100));
 		
-		JButton orient = new JButton("Set Vertical");
-		orient = gc.setOrientButton(orient);
+		orient = new JButton("Set Vertical");
+		orient = gc.setOrientButton();
 		orient.setPreferredSize(new Dimension(10, 10));
 		placeButtons.add(orient);
 		
-		JButton place = new JButton("Place Ship");
-		place = gc.setPlaceButton(place);
+		place = new JButton("Place Ship");
+		place = gc.setPlaceButton();
 		place.setPreferredSize(new Dimension(10, 10));
 		placeButtons.add(place);
 		
-		JButton cancelPlace = new JButton("Cancel");
-		cancelPlace = gc.setCancelPlaceButton(cancelPlace);
+		cancelPlace = new JButton("Cancel");
+		cancelPlace = gc.setCancelPlaceButton();
 		cancelPlace.setPreferredSize(new Dimension(10, 10));
 		placeButtons.add(cancelPlace);
 		
+		//Build startOrExit panel
+		startOrExit.setLayout(new GridLayout(2, 1, 0, 10));
+		startOrExit.setPreferredSize(new Dimension(100,100));
+		
+		beginBattle = new JButton("BATTLE!");
+		beginBattle = gc.setBeginButton();
+		startOrExit.add(beginBattle);
+		
+		JButton exitGame = new JButton("Exit Game");
+		startOrExit.add(exitGame);
+		
 		placeCommands.add(shipButtons);
 		placeCommands.add(placeButtons);
+		placeCommands.add(startOrExit);
 	}
 	
 	public void buildPlayerSide(JPanel ps) {
@@ -333,10 +261,12 @@ public class BattleshipBoardPanel extends JPanel {
 		fireButtons.setLayout(new GridLayout(2, 1, 0, 15));
 		
 		JButton fire = new JButton("Fire!");
+		fire = gc.setFireButton();
 		fire.setBackground(new Color(200, 0, 0));
 		fireButtons.add(fire);
 		
 		JButton cancelFire = new JButton("Cancel");
+		cancelFire = gc.setCancelFireButton();
 		cancelFire.setBackground(new Color(131, 209, 232));
 		fireButtons.add(cancelFire);
 	}
@@ -351,8 +281,8 @@ public class BattleshipBoardPanel extends JPanel {
 		targetStatus.setLayout(new BoxLayout(targetStatus, BoxLayout.Y_AXIS));
 		
 		enemyStatus = new JLabel(" ");
-		JLabel enemyShipsAfloat = new JLabel("Enemy Ships Afloat: ");
-		JLabel enemyShipsSunk = new JLabel("Enemy Ships Sunk: ");
+		JLabel enemyShipsAfloat = new JLabel("  ");
+		JLabel enemyShipsSunk = new JLabel("  ");
 		
 		targetStatus.add(enemyStatus);
 		targetStatus.add(enemyShipsAfloat);
@@ -367,7 +297,6 @@ public class BattleshipBoardPanel extends JPanel {
 	
 	public void setError(String message) {
 		error.setText(message);
-		//this.add(error);
 	}
 	
 	public void setPlayerStatus(JLabel playerStatus) {
@@ -382,21 +311,12 @@ public class BattleshipBoardPanel extends JPanel {
 		enemyStatus.setText(message);
 	}
 	
-	public void setGameController(GameController gc) {
+	public void setBattleshipBoardController(BattleshipBoardController gc) {
 		this.gc = gc;
 	}
 	
-	public GameController getGameController() {
+	public BattleshipBoardController getGameController() {
 		return gc;
-	}
-
-	public static void main(String[] args) {
-		//this.gc = getGameController();
-		//oceanGrid = new GameGrid();
-		//targetGrid = new GameGrid();
-		//buildBoard();
-		
-
 	}
 
 }

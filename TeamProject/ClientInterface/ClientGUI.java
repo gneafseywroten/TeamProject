@@ -1,104 +1,84 @@
 package ClientInterface;
 
-import java.awt.BorderLayout;
-import java.awt.GameLayout;
-import java.awt.EventQueue;
-import java.awt.GridBagLayout;
-import java.io.IOException;
+import java.awt.*;
+import java.io.*;
+import javax.swing.*;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+import ClientCommunication.GameClient;
+import ocsf.client.*;
 
-import ClientInterface.GameClient;
-import ClientInterface.ClientGUI;
-import ClientInterface.GamePanel;
-import ClientInterface.CreateAccountControl;
-import ClientInterface.CreateAccountPanel;
-import ClientInterface.InitialControl;
-import ClientInterface.InitialPanel;
-import ClientInterface.LoginControl;
-import ClientInterface.TotalWinsPanel;
-import ClientInterface.ReadyUpPanel;
-import ClientInterface.StartJoinGamePanel;
-import ClientInterface.DifficultyPanel;
+public class ClientGUI extends JFrame {
 
-public class ClientGUI extends JFrame
-{
-  
-  
-  // Constructor that creates the client GUI.
-  public ClientGUI()
-  {
-    // Set up the chat client.
-   GameClient client = new GameClient();
-    client.setHost("localhost");
-    client.setPort(8300);
-    try
-    {
-      client.openConnection();
-    }
-    catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-    
-    
-    
-    // Set the title
-    this.setTitle("Game Client");
-    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-    // Create the card layout container.
-    GameLayout gameLayout = new GameLayout();
-    JPanel container = new JPanel(gameLayout);
-    
-    //Create the Controllers next
-    //Next, create the Controllers
-    InitialControl ic = new InitialControl(container,client);
-    LoginControl lc = new LoginControl(container,client);
-    CreateAccountControl cac = new CreateAccountControl(container,client);
-    
-    //Set the client info
-    client.setLoginControl(lc);
-    client.setCreateAccountControl(cac);
-   
-    
-    // Create the four views. (need the controller to register with the Panels
-    JPanel view1 = new InitialPanel(ic);
-    JPanel view2 = new LoginPanel(lc);
-    JPanel view3 = new CreateAccountPanel(cac);
-    JPanel view4 = new BattleshipBoardPanel();
-    JPanel view5 = new DifficultyPanel();
-    JPanel view6 = new ReadyUpPanel();
-    JPanel view7 = new TotalWinsPanel();
-    
-    // Add the views to the card layout container.
-    container.add(view1, "1");
-    container.add(view2, "2");
-    container.add(view3, "3");
-    container.add(view4, "4");
-    container.add(view5, "5");
-    container.add(view6, "6");
-    container.add(view7, "7");
-   
-    
-    // Show the initial view in the card layout.
-    gameLayout.show(container, "1");
-    
-    // Add the card layout container to the JFrame.
-    // GridBagLayout makes the container stay centered in the window.
-    this.setLayout(new GridBagLayout());
-    this.add(container);
+	public ClientGUI(GameClient client) {
 
-    // Show the JFrame.
-    this.setSize(550, 350);
-    this.setVisible(true);
-  }
+		this.setTitle("Battleship");
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-  // Main function that creates the client GUI when the program is started.
-  public static void main(String[] args)
-  {
-    new ClientGUI();
-  }
+		// Create the card layout container.
+		CardLayout cardLayout = new CardLayout();
+		JPanel container = new JPanel(cardLayout);
+
+		InitialControl ic = new InitialControl(container);
+		LoginControl lc = new LoginControl(container,client);
+		CreateAccountControl cac = new CreateAccountControl(container,client);
+		StartJoinGameControl sjgc = new StartJoinGameControl(container,client);
+		BattleshipBoardData data = new BattleshipBoardData();
+		
+		BattleshipBoardPanel gameBoard = new BattleshipBoardPanel(container, client, data);
+		
+
+		client.setLoginControl(lc);
+		client.setCreateAccountControl(cac);
+		BattleshipBoardController gameController = new BattleshipBoardController(data,gameBoard);
+		gameBoard.setBattleshipBoardController(gameController);
+		gameBoard.buildBoard();
+
+		JPanel view1 = new InitialPanel(ic);
+		JPanel view2 = new LoginPanel(lc);
+		JPanel view3 = new CreateAccountPanel(cac);
+		JPanel view4 = new StartJoinGamePanel(sjgc);
+		//JPanel view5 = new JoinPanel();
+		//JPanel view6 = new ReadyUpPanel();
+		JPanel view7 = gameBoard;
+
+		container.add(view1,"1");
+		container.add(view2,"2");
+		container.add(view3,"3");
+		container.add(view4,"4");
+		//container.add(view5,"5");
+		//container.add(view6,"6");
+		container.add(view7,"7");
+
+		cardLayout.show(container, "1");
+
+		// Add the card layout container to the JFrame.
+		// GridBagLayout makes the container stay centered in the window.
+		this.setLayout(new GridBagLayout());
+		this.add(container);
+
+		// Show the JFrame.
+		this.setSize(1250, 700);
+		this.setVisible(true);
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String host = args[0];
+
+		//Instantiate client
+		GameClient client = new GameClient(host);
+
+		new ClientGUI(client);
+
+		//Open client connection
+		try {
+			client.openConnection();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Client could not connect");
+		}
+
+	}
+
 }

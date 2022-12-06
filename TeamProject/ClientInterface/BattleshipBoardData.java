@@ -2,21 +2,28 @@ package ClientInterface;
 
 
 import java.util.ArrayList;
+import java.util.List;
+
+import serverController.SingleCoordinate;
 
 public class BattleshipBoardData {
 	private SingleCoordinate coordinate;
-	private int x_coords[];
-	private char y_coords[];
 	private int x_coord;
 	private char y_coord;
-	private Ship ship;
-	private ArrayList<SingleCoordinate> coordsList = new ArrayList<SingleCoordinate>();
+	private ArrayList<SingleCoordinate> playerCoords = new ArrayList<SingleCoordinate>();
+	private ArrayList<SingleCoordinate> enemyCoords = new ArrayList<SingleCoordinate>();
 	private boolean shipSelected;
 	private boolean horizontal = true;
-	private boolean placementValid = false;
+	private boolean placementValid;
+	private boolean defeat = false;
 	private int shipLength = 1;
 	private int shipIndex;
 	private int[] shipPlaced = {0,0,0,0,0};
+	private int coord_index;
+	private int numShipsPlaced;
+	private int numShipsSunk = 0;
+	private List<Integer> coordsPlaced = new ArrayList<>();
+	private String shipType;
 	
 	//Setters and getters for coordinates and ships
 	public void setCoordinate(SingleCoordinate coordinate) {
@@ -43,20 +50,28 @@ public class BattleshipBoardData {
 		return y_coord;
 	}
 	
-	public void setShip(Ship ship) {
-		this.ship = ship;
+	public void addPlayerCoordinate(int i, SingleCoordinate coord) {
+		playerCoords.add(i, coord);
 	}
 	
-	public Ship getShip() {
-		return ship;
+	public void changePlayerCoordinate(int i, SingleCoordinate coord) {
+		playerCoords.set(i, coord);
 	}
 	
-	public void addCoordinate(int i, SingleCoordinate coord) {
-		coordsList.add(i, coord);
+	public SingleCoordinate getPlayerCoordinate(int i) {
+		return playerCoords.get(i);
 	}
 	
-	public SingleCoordinate getCoordinate(int i) {
-		return coordsList.get(i);
+	public void addEnemyCoordinate(int i, SingleCoordinate coord) {
+		enemyCoords.add(i, coord);
+	}
+	
+	public void changeEnemyCoordinate(int i, SingleCoordinate coord) {
+		enemyCoords.set(i, coord);
+	}
+	
+	public SingleCoordinate getEnemyCoordinate(int i) {
+		return enemyCoords.get(i);
 	}
 	
 	public void setShipSelected(boolean shipSelected) {
@@ -81,6 +96,7 @@ public class BattleshipBoardData {
 	
 	public int getShipLength() {
 		return shipLength;
+	}
 	
 	public void setPlacementValid(boolean placementValid) {
 		this.placementValid = placementValid;
@@ -98,11 +114,58 @@ public class BattleshipBoardData {
 		return shipIndex;
 	}
 	
-	public void setShipPlaced (int shipIndex) {
+	public void setShipPlaced(int shipIndex) {
 		this.shipPlaced[shipIndex] = 1;
 	}
 	
-	public int getShipPlaced (int shipIndex) {
+	public int getShipPlaced(int shipIndex) {
 		return shipPlaced[shipIndex];
 	}
+	
+	public void setCoordIndex(int coord_index) {
+		this.coord_index = coord_index;
+	}
+	
+	public int getCoordIndex() {
+		return coord_index;
+	}
+	
+	public void addShipSunk() {
+		numShipsSunk++;
+		if (numShipsSunk == 5)
+			this.defeat = true;
+	}
+	
+	public boolean defeated() {
+		return defeat;
+	}
+	
+	public int getNumShipsSunk() {
+		return numShipsSunk;
+	}
+	
+	public int getNumShipsPlaced() {
+		return numShipsPlaced;
+	}
+	
+	public void setNumShipsSunk(int numShipsSunk) {
+		this.numShipsSunk = numShipsSunk;
+	}
+	
+	public void testGUI() {
+		enemyCoords = playerCoords;
+	}
+	
+	public ArrayList<SingleCoordinate> getAllPlayerCoords() {
+		return playerCoords;
+	}
+	
+	public void setAllEnemyCoords(ArrayList<SingleCoordinate> enemyCoords) {
+		this.enemyCoords = enemyCoords;
+	}
+	
+	public ArrayList<SingleCoordinate> getAllEnemyCoords() {
+		return enemyCoords;
+	}
+
 }
