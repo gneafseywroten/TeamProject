@@ -2,21 +2,36 @@ package ServerCommunicationAndData;
 
 import java.io.*;
 import java.util.*;
+
+import ClientCommunication.StartNewGame;
 import ClientInterface.CreateAccountData;
 import ClientInterface.LoginData;
+import ClientInterface.ShotData;
 import ocsf.server.*;
+import serverController.Match;
+import serverController.SingleCoordinate;
 
-public class GameServer extends AbstractServer
-{
+public class GameServer extends AbstractServer {
 	private boolean running = false;
 	private boolean listening = false;
 	private Database db;
-	
+	private User user;
+	private ArrayList<User> onlinePlayers = new ArrayList<User>();
+	private ArrayList<User> startedGames = new ArrayList<User>();
+	private Match match;
+	private User player1;
+	private User player2;
+	private long player1_id;
+	private long player2_id;
+	private ConnectionToClient conn1;
+	private ConnectionToClient conn2;
+	private String message;
+
 	public GameServer() {
 		super(8300);
 		this.setTimeout(500);
 	}
-	
+
 	public void setDatabase(Database db) {
 		this.db = db;
 	}
@@ -47,6 +62,9 @@ public class GameServer extends AbstractServer
 
 	public void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
 		System.out.println("Attempting to receive message from client");
+		if (arg0 instanceof String) {
+			message = (String) arg0;
+		}
 
 		if (arg0 instanceof LoginData) {
 			System.out.println("This is an instance of LoginData");
@@ -58,9 +76,12 @@ public class GameServer extends AbstractServer
 			verify = db.verifyAccount(data.getUsername(), data.getPassword());
 
 			if (verify) {
-				//User user = new User(data.getUsername(), data.getPassword(), db.getUserRatio(data.getUsername()));
+				user = new User(data.getUsername(), data.getPassword());
+				user.setConnectionToClient(arg1);
 				System.out.println("Client " + arg1.getId() + " successfully logged in as " + data.getUsername() + "\n");
 				result = "LoginSuccessful";
+				onlinePlayers.add(user);
+
 			}
 			else {
 				result = "LoginError";
@@ -69,7 +90,25 @@ public class GameServer extends AbstractServer
 
 			try {
 				arg1.sendToClient(result);
-				arg1.sendToClient("MyName: " + data.getUsername());
+				arg1.sendToClient("I am: " + data.getUsername());
+				int playersReady = onlinePlayers.size();
+				if (playersReady >= 2) {
+					player1 = onlinePlayers.get(0);
+					player2 = onlinePlayers.get(1);
+					conn1 = player1.getConnectionToClient();
+					conn2 = player2.getConnectionToClient();
+					player1_id = conn1.getId();
+					player2_id = conn2.getId();
+					String message1 = "Welcome, Player 1";
+					String message2 = "Welcome, Player 2";
+					try {
+						conn1.sendToClient(message1);
+						conn2.sendToClient(message2);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				System.out.print("Could not send login verification data to client");
@@ -86,10 +125,9 @@ public class GameServer extends AbstractServer
 			Object result;
 
 			created = db.createAccount(data.getUsername(), data.getPassword());
-			
+
 
 			if (created) {
-				//User user = new User(data.getUsername(), data.getPassword());
 				result = "CreateSuccessful";
 				System.out.println("Client " + arg1.getId() + " created a new account called " + data.getUsername() + "\n");
 			}
@@ -106,17 +144,116 @@ public class GameServer extends AbstractServer
 				e.printStackTrace();
 			}
 		}
+		
+		else if (arg0 instanceof SingleCoordinate) {
+			long currentPlayer = arg1.getId();
+
+			if (currentPlayer == player1_id) {
+				try {
+					conn2.sendToClient(arg0);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			else if (currentPlayer == player2_id) {
+				try {
+					conn1.sendToClient(arg0);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		}
+
+		else if (arg0 instanceof ArrayList) {
+			long currentPlayer = arg1.getId();
+
+			if (currentPlayer == player1_id) {
+				try {
+					conn2.sendToClient(arg0);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+			}
+			else if (currentPlayer == player2_id) {
+				try {
+					conn1.sendToClient(arg0);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		}
+
+		else if (arg0 instanceof ShotData) {
+			long currentPlayer = arg1.getId();
+
+			if (currentPlayer == player1_id) {
+				try {
+					conn2.sendToClient(arg0);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else if (currentPlayer == player2_id) {
+				try {
+					conn1.sendToClient(arg0);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		else if (message.equals("YOU WIN!!!")) {
+			long currentPlayer = arg1.getId();
+
+			if (currentPlayer == player1_id) {
+				try {
+					conn2.sendToClient(arg0);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				boolean won = db.gameWon(player2.getUsername());
+				if (won)
+					System.out.println("Successfully updated database");
+				
+			}
+			else if (currentPlayer == player2_id) {
+				try {
+					conn1.sendToClient(arg0);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				boolean won = db.gameWon(player1.getUsername());
+				if (won)
+					System.out.println("Successfully updated database");
+			}
+		}
 	}
+
 
 	public void listeningException(Throwable exception) {
 		running = false;
 		System.out.println("Listening exception: " + exception.getMessage());
 	}
 
-	public void clientConnected(ConnectionToClient clientConnection) {
+	public void clientConnected(ConnectionToClient connectedClient) {
 		System.out.println("Client Connected");
 		try {
-			clientConnection.sendToClient("Hello there");
+			connectedClient.sendToClient("Hello there");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -163,9 +300,5 @@ public class GameServer extends AbstractServer
 		}
 
 	}
-  
-  
+
 }
-
-
-

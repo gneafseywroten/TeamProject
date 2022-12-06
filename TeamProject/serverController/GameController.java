@@ -48,11 +48,6 @@ public class GameController implements ActionListener {
 	private int shipLength;
 	private int shipIndex;
 	private int shipPlaced[] = {0,0,0,0,0};
-	private int destroyerCoords[] = {-1,-1};
-	private int submarineCoords[] = {-1,-1,-1};
-	private int cruiserCoords[] = {-1,-1,-1};
-	private int batshipCoords[] = {-1,-1,-1,-1};
-	private int carrierCoords[] = {-1,-1,-1,-1,-1};
 	private int coord_index;
 	private String shipType;
 	private List<Integer> coordsSelected = new ArrayList<>();
@@ -417,6 +412,7 @@ public class GameController implements ActionListener {
 //        System.out.println("column: "+col);
 	}
 	
+	
 	public JButton setOrientButton() {
 		orient.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -642,7 +638,7 @@ public class GameController implements ActionListener {
 		beginBattle.setEnabled(false);
 		beginBattle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//data.testGUI();
+				data.testGUI();
 			}
 		});
 		return beginBattle;
@@ -875,7 +871,5 @@ public class GameController implements ActionListener {
 		// TODO Auto-generated method stub
 
 	}
-
-
 
 }

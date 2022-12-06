@@ -2,7 +2,8 @@ package serverController;
 
 import java.util.*;
 
-public abstract class Ship {
+public class Ship {
+	//private List<SingleCoordinate> newShip = new ArrayList<>();
 	private String shipType;
 	private char status;
 	private int length = 1;
@@ -42,6 +43,5 @@ public abstract class Ship {
 	public boolean isPlaced() {
 		return placed;
 	}
-
 
 }

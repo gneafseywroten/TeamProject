@@ -12,36 +12,42 @@ public class Database {
 	private String aeskey;
 	private FileInputStream fis;
 	
-	public Database() {
-		try {
-			fis = new FileInputStream("./serverCommunicationAndData/db.properties");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Could not find properties file");
-			e.printStackTrace();
+		
+		public void setConnection(String fn) {
+			try {
+				fis = new FileInputStream("./serverCommunicationAndData/db.properties");
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Could not find properties file");
+				e.printStackTrace();
+			}
+			
+			Properties props = new Properties();
+			try {
+				props.load(fis);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Could not load properties file");
+				e.printStackTrace();
+			}
+			username = props.getProperty("user");
+			password = props.getProperty("password");
+			url = props.getProperty("url");
+			aeskey = props.getProperty("aeskey");
+			
+			try {
+				conn = DriverManager.getConnection(url, username, password);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Could not establish connection to database");
+				e.printStackTrace();
+			}
 		}
 		
-		Properties props = new Properties();
-		try {
-			props.load(fis);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Could not load properties file");
-			e.printStackTrace();
+		public Connection getConnection() {
+			return conn;
 		}
-		username = props.getProperty("user");
-		password = props.getProperty("password");
-		url = props.getProperty("url");
-		aeskey = props.getProperty("aeskey");
 		
-		try {
-			conn = DriverManager.getConnection(url, username, password);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Could not establish connection to database");
-			e.printStackTrace();
-		}
-	}
 	
 	public ResultSet query(String query) {
 		try {
@@ -91,6 +97,12 @@ public class Database {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	public boolean gameWon(String username) {
+		String dml = "UPDATE users SET wins=wins+1 where username='"+username+"';";
+		boolean executed = executeDML(dml);
+		return executed;
 	}
 	
 	public boolean finish() {
