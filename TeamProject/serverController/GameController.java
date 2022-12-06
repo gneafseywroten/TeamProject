@@ -36,6 +36,7 @@ public class GameController implements ActionListener {
  	private JButton cancelPlace = new JButton();
 	private JButton beginBattle = new JButton();
 	private JButton fire = new JButton();
+	private JButton cancelFire = new JButton();
 	private JLabel playerStatus = new JLabel(" ");
 	private boolean shipSelected;
 	private boolean playerSquaresSelected;
@@ -416,25 +417,7 @@ public class GameController implements ActionListener {
 //        System.out.println("column: "+col);
 	}
 	
-	public void selectShip(ActionEvent ae) {
-		//Select the ship to place
-		JButton button = (JButton) ae.getSource();
-		button.setEnabled(false);
-		Rectangle rectangle = button.getBounds();
-        Point point = button.getLocation();
-        
-        // calculate field position
-//        int row = point.y / rectangle.height;
-//        int col = point.x / rectangle.width;
-//
-//        setRow(row);
-//        setCol(col);
-        
-        
-		
-	}
-	
-	public JButton setOrientButton(JButton button) {
+	public JButton setOrientButton() {
 		orient.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				horizontal = data.getHorizontal();
@@ -453,7 +436,7 @@ public class GameController implements ActionListener {
 		return orient;
 	}
 	
-	public JButton setPlaceButton (JButton button) {
+	public JButton setPlaceButton () {
 		place.setEnabled(false);
 		place.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -589,6 +572,11 @@ public class GameController implements ActionListener {
 						place.setEnabled(false);
 						cancelPlace.setEnabled(false);
 						beginBattle.setEnabled(true);
+						for (int j = 0; j < M_GRID_SIZE; j++) {
+							for (int k = 0; k < M_GRID_SIZE; k++) {
+								playerGridButton[j][k].setEnabled(false);
+							}
+						}
 					}
 				}
 				place.setEnabled(false);
@@ -604,19 +592,13 @@ public class GameController implements ActionListener {
 		return place;
 	}
 	
-	public JButton setCancelPlaceButton(JButton button) {
+	public JButton setCancelPlaceButton() {
 		cancelPlace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < 5; i++) {
 					if (shipPlaced[i] == 0) {
 						shipButton[i].setEnabled(true);
 					}
-				}
-				int listLength = coordsPlaced.size();
-				int[] temp_arr;
-				temp_arr = new int[listLength];
-				for (int i = 0; i < listLength; i++) {
-					temp_arr[i] = coordsPlaced.get(i);
 				}
 				
 				for (int i = 0; i < M_GRID_SIZE; i++) {
@@ -625,14 +607,15 @@ public class GameController implements ActionListener {
 					}
 				}
 
-				int temp2;
+				int listLength = coordsPlaced.size();
+				int temp = 0;
 				for (int i = 0; i < listLength; i++) {
-					temp2 = temp_arr[i];
+					temp = coordsPlaced.get(i);
 					for (int j = 0; j < M_GRID_SIZE; j++) {
 						for (int k = 0; k < M_GRID_SIZE; k++) {
 							coord_index = (j * M_GRID_SIZE) + k;
-							if (temp2 == coord_index) {
-								playerGridButton[j][k].setText("o");
+							if (temp == coord_index) {
+								playerGridButton[j][k].setText("^");
 								playerGridButton[j][k].setEnabled(false);
 							}
 						}
@@ -655,11 +638,11 @@ public class GameController implements ActionListener {
 		return cancelPlace;
 	}
 	
-	public JButton setBeginButton(JButton button) {
+	public JButton setBeginButton() {
 		beginBattle.setEnabled(false);
 		beginBattle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				//data.testGUI();
 			}
 		});
 		return beginBattle;
@@ -678,15 +661,15 @@ public class GameController implements ActionListener {
 		enemyGridButton[buttonRow][buttonCol].setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
 		enemyGridButton[buttonRow][buttonCol].setCursor(new Cursor(Cursor.HAND_CURSOR));
 		enemyGridButton[buttonRow][buttonCol].addMouseListener(new MouseAdapter() {
-			  public void mouseEntered(MouseEvent evt) {
-			    JButton button = (JButton) evt.getSource();
-			    enemyGridButton[buttonRow][buttonCol].setBackground(Color.CYAN);
-			  }
+//			  public void mouseEntered(MouseEvent evt) {
+//			    JButton button = (JButton) evt.getSource();
+//			    enemyGridButton[buttonRow][buttonCol].setBackground(Color.CYAN);
+//			  }
 
-			  public void mouseExited(java.awt.event.MouseEvent evt) {
-			    JButton button = (JButton) evt.getSource();
-			    enemyGridButton[buttonRow][buttonCol].setBackground(new Color(131, 209, 232));
-			  }
+//			  public void mouseExited(java.awt.event.MouseEvent evt) {
+//			    JButton button = (JButton) evt.getSource();
+//			    enemyGridButton[buttonRow][buttonCol].setBackground(new Color(131, 209, 232));
+//			  }
 			  
 			  public void mouseClicked(java.awt.event.MouseEvent evt) {
 				  JButton button = (JButton) evt.getSource();
@@ -714,42 +697,162 @@ public class GameController implements ActionListener {
 		fire.setEnabled(false);
 		fire.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String playerMessage = " ";
+				String enemyMessage = " ";
+				//if (!targetSquareSelected) {
+				//message = "You must select a coordinate to fire on";
+				//gameBoard.setEnemyMessage(message);
 				//SingleCoordinate fire_coord = getCoord(coord_index);
 				//boolean occupied = fire_coord.isOccupied();
 				//if (occupied) {
 				//	String firedShip = fire_coord.getShipType();
-				//	if (firedShip.equals("Destroyer")) {
+				//	if (firedShip.equals("Destroyer"))
 				//		destroyer.hit();
-				//	else if (fired.Ship.equals("Submarine)) {
+				//	else if (firedShip.equals("Submarine"))
 				//		submarine.hit();
 				//	fire_coord = new SingleCoordinate(coord_index,true,'h');
 				//	changeCoord(coord_index, fire_coord);
-				//else {
+				//else
 				//	fire_coord = new SingleCoordinate(coord_index,false,'m');
-				//firedAt.add(fire_coord);
+				//firedAtCoords.add(fire_coord);
 				//int fire_col = coord_index mod 10;
 				//int fire_row = coord_index - fire_col;
 				//enemyGridButton[fire_row][fire_col].setEnabled(false);
+				//}
+				
+				//Test method
+				if (!targetSquareSelected ) {
+					enemyMessage = "You must select a coordinate to fire on";
+					gameBoard.setEnemyMessage(enemyMessage);
+				}
+				else {
+					SingleCoordinate fire_coord = data.getEnemyCoordinate(coord_index);
+					boolean fired = fire_coord.isFired();
+					if (fired) {
+						enemyMessage = "You have already fired on this coordinate";
+						gameBoard.setEnemyMessage(enemyMessage);
+					}
+					else {
+						double column = (double)coord_index % M_GRID_SIZE;
+						double row = (coord_index - column) / (double)M_GRID_SIZE;
+						int fire_col = (int)column;
+						int fire_row = (int)row;
+						boolean occupied = fire_coord.isOccupied();
+						if (occupied) {
+							String firedShip = fire_coord.getshipType();
+							boolean isSunk = false;
+							if (firedShip.equals("Destroyer")) {
+								destroyer.hit();
+								isSunk = destroyer.sunk();
+								if (isSunk)
+									data.addShipSunk();
+							}
+							else if (firedShip.equals("Submarine")) {
+								submarine.hit();
+								isSunk = submarine.sunk();
+								if (isSunk)
+									data.addShipSunk();
+							}
+							else if (firedShip.equals("Cruiser")) {
+								cruiser.hit();
+								isSunk = cruiser.sunk();
+								if (isSunk)
+									data.addShipSunk();
+							}
+							else if (firedShip.equals("Battleship")) {
+								battleship.hit();
+								isSunk = battleship.sunk();
+								if (isSunk)
+									data.addShipSunk();
+							}
+							else if (firedShip.equals("Carrier")) {
+								carrier.hit();
+								isSunk = carrier.sunk();
+								if (isSunk)
+									data.addShipSunk();
+							}
+							enemyMessage = "It's a hit!";
+							gameBoard.setEnemyMessage(enemyMessage);
+							playerMessage = "The enemy has hit your " + shipType;
+							gameBoard.setPlayerMessage(playerMessage);
+							if (isSunk) {
+								fire_coord = new SingleCoordinate(coord_index,true,'s');
+								int num = data.getNumShipsSunk();
+								enemyMessage = "Enemy Ships Sunk: " + num;
+								gameBoard.setEnemyMessage(enemyMessage);
+							}
+							else {
+								fire_coord = new SingleCoordinate(coord_index,true,'h');
+							}
+							enemyGridButton[fire_row][fire_col].setText("X");
+							enemyGridButton[fire_row][fire_col].setBackground(Color.RED);
+							playerGridButton[fire_row][fire_col].setText("X");
+							playerGridButton[fire_row][fire_col].setBackground(Color.RED);
+							boolean won = data.playerWon();
+							if (won) {
+								enemyMessage = "YOU WIN!!!";
+								gameBoard.setEnemyMessage(enemyMessage);
+								playerMessage = "Defeated";
+								gameBoard.setPlayerMessage(playerMessage);
+							}
+						}
+						else {
+							fire_coord = new SingleCoordinate(coord_index,true,'m');
+							enemyMessage = "It's a miss";
+							gameBoard.setEnemyMessage(enemyMessage);
+							playerMessage = "Enemy missed";
+							gameBoard.setPlayerMessage(playerMessage);
+							enemyGridButton[fire_row][fire_col].setText("O");
+							enemyGridButton[fire_row][fire_col].setBackground(Color.WHITE);
+							playerGridButton[fire_row][fire_col].setText("O");
+							playerGridButton[fire_row][fire_col].setBackground(Color.WHITE);
+						}
+						fire_coord.setFiredAt(true);
+						data.changeEnemyCoordinate(coord_index, fire_coord);
+						firedAt.add(coord_index);
+						enemyGridButton[fire_row][fire_col].setEnabled(false);
+					}
+					//enemyGridButton[j][k].setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
+					targetSquareSelected = false;
+				}
 			}
 		});
 		return fire;
+	}
+	
+	public JButton setCancelFireButton() {
+		cancelFire = new JButton("Cancel");
+		cancelFire.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (targetSquareSelected) {
+					double column = (double)coord_index % M_GRID_SIZE;
+					double row = (coord_index - column) / (double)M_GRID_SIZE;
+					int select_col = (int)column;
+					int select_row = (int)row;
+					enemyGridButton[select_row][select_col].setEnabled(true);
+					enemyGridButton[select_row][select_col].setBorder(BorderFactory.createLineBorder(new Color(32, 156, 185)));
+				}
+				targetSquareSelected = false;
+			}
+		});
+		return cancelFire;
 	}
 	
 	public void displayError(String message) {
 		 gameBoard.setError(message);
 	}
 	
-	public void displayPlayerMessage(String message) {
-		//Pass selected, placed, hit or miss, or error message into playerStatus JLabel in GameBoard
-	    GameBoard gameBoard = (GameBoard)container.getComponent(1);
-	    gameBoard.setPlayerMessage(message);
-	}
-	
-	public void displayEnemyMessage(String message) {
-		//Pass selected, placed, hit or miss, or error message into enemyStatus JLabel in GameBoard
-	    GameBoard gameBoard = (GameBoard)container.getComponent(1);
-	    gameBoard.setEnemyMessage(message);
-	}
+//	public void displayPlayerMessage(String message) {
+//		//Pass selected, placed, hit or miss, or error message into playerStatus JLabel in GameBoard
+//	    GameBoard gameBoard = (GameBoard)container.getComponent(1);
+//	    gameBoard.setPlayerMessage(message);
+//	}
+//	
+//	public void displayEnemyMessage(String message) {
+//		//Pass selected, placed, hit or miss, or error message into enemyStatus JLabel in GameBoard
+//	    GameBoard gameBoard = (GameBoard)container.getComponent(1);
+//	    gameBoard.setEnemyMessage(message);
+//	}
 	
 	public void setRow(int row) {
 		this.row = row;
@@ -772,6 +875,7 @@ public class GameController implements ActionListener {
 		// TODO Auto-generated method stub
 
 	}
+
 
 
 }

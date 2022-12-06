@@ -1,149 +1,168 @@
 package ServerCommunicationAndData;
 
-import java.awt.*;
-import javax.swing.*;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import ocsf.server.AbstractServer;
-import ocsf.server.ConnectionToClient;
+import java.io.*;
+import java.util.*;
+import ClientInterface.CreateAccountData;
+import ClientInterface.LoginData;
+import ocsf.server.*;
 
 public class GameServer extends AbstractServer
 {
-  // Data fields for this chat server.
-  private boolean running = false;
-  private DatabaseFile database = new DatabaseFile();
-  private int num_clients;
+	private boolean running = false;
+	private boolean listening = false;
+	private Database db;
+	
+	public GameServer() {
+		super(8300);
+		this.setTimeout(500);
+	}
+	
+	public void setDatabase(Database db) {
+		this.db = db;
+	}
 
-  // Constructor for initializing the server with default settings.
-  public GameServer()
-  {
-    super(12345);
-    this.setTimeout(500);
-  }
+	public void serverStarted() {
+		running = true;
+		System.out.println("Sever Started");
+		listening = isListening();
+		if (listening)
+			System.out.println("Server Listening");
+		else
+			System.out.println("Server NOT Listening");
+	}
 
-  public boolean isRunning()
-  {
-    return running;
-  }
-  
-  public void serverStarted()
-  {
-    running = true;
-    System.out.println("Server started");
-  }
-  
-   public void serverStopped()
-   {
-     System.out.println("Server stopped");
-   }
- 
-  // When the server closes completely, update the GUI.
-  public void serverClosed()
-  {
-    running = false;
-    System.out.println("Server Closed");
-  }
+	public void serverStopped() {
+		System.out.println("Server Stopped");
+	}
 
-  // When a client connects or disconnects, display a message in the log.
-  public void clientConnected(ConnectionToClient client)
-  {
-	  System.out.println("Client Connected");
-  }
-  
-  public void clientDisconnected(ConnectionToClient client)
-  {
-	  System.out.println("Client Disconnected");
-  }
+	public void serverClosed() {
+		running = false;
+		System.out.println("Server Closed");
+	}
 
-  // When a message is received from a client, handle it.
-  public void handleMessageFromClient(Object arg0, ConnectionToClient arg1)
-  {
-	  System.out.println(arg0);
-	 
-    // If we received LoginData, verify the account information.
-	 if (arg0 instanceof LoginData)
-    {
-      // Check the username and password with the database.
-	LoginData data = (LoginData)arg0;
-      Object result;
-      String q = "select * from Users table";
-      Object win;
-      
-      ArrayList<String> r = database.query(q);
-      for (String row : r)
-      {
-      if (row.equals(data.getUsername() + data.getPassword() + data.getNum_Win()))
-      {
-        result = "LoginSuccessful";
-      }
-      
-      else
-      {
-        result =("The username and password are incorrect.");
-      }
-      // Send the result to the client.
-      try
-      {
-        arg1.sendToClient(r);
-      }
-      catch (IOException e)
-      {
-        return;
-      }
-      }
-      
-   
-    }
-    
-    // If we received CreateAccountData, create a new account.
-    else if (arg0 instanceof CreateAccountData)
-    {
-      // Try to create the account.
-      CreateAccountData data = (CreateAccountData)arg0;
-      Object result;
-      String q = "select * from Users table";
-      ArrayList<String> r = database.query(q);
-      
-      for (String row : r)
-      {
-      if (row.equals(data.getUsername() + data.getPassword()))
-      {
-        result = "The username is already in use.";
-      }
-      else
-      {
-    	  System.out.println("false");
-    	  result = "CreateAccountSuccessful";
-    	  String d = "insert into Users values ('" + data.getUsername() + ", aes_encrypt('" + data.getPassword() + "' , 'key'";
-    	  
-    	  try {
-			database.executeDML(d);
-		} catch (SQLException e) {
+	// Getter that returns whether the server is currently running.
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
+		System.out.println("Attempting to receive message from client");
+
+		if (arg0 instanceof LoginData) {
+			System.out.println("This is an instance of LoginData");
+			// Check the username and password with the database.
+			LoginData data = (LoginData)arg0;
+			boolean verify = false;
+			Object result;
+
+			verify = db.verifyAccount(data.getUsername(), data.getPassword());
+
+			if (verify) {
+				//User user = new User(data.getUsername(), data.getPassword(), db.getUserRatio(data.getUsername()));
+				System.out.println("Client " + arg1.getId() + " successfully logged in as " + data.getUsername() + "\n");
+				result = "LoginSuccessful";
+			}
+			else {
+				result = "LoginError";
+				System.out.println("Client " + arg1.getId() + " failed to login\n");
+			}
+
+			try {
+				arg1.sendToClient(result);
+				arg1.sendToClient("MyName: " + data.getUsername());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.print("Could not send login verification data to client");
+				e.printStackTrace();
+			}
+
+		}
+
+		else if (arg0 instanceof CreateAccountData) {
+			System.out.println("This is an instance of CreateAccountData");
+			// Try to create the account.
+			CreateAccountData data = (CreateAccountData)arg0;
+			boolean created = false;
+			Object result;
+
+			created = db.createAccount(data.getUsername(), data.getPassword());
+			
+
+			if (created) {
+				//User user = new User(data.getUsername(), data.getPassword());
+				result = "CreateSuccessful";
+				System.out.println("Client " + arg1.getId() + " created a new account called " + data.getUsername() + "\n");
+			}
+			else {
+				result = "CreateError";
+				System.out.println("Client " + arg1.getId() + " failed to create a new account\n");
+			}
+
+			try {
+				arg1.sendToClient(result);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Could not send account creation result to client");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void listeningException(Throwable exception) {
+		running = false;
+		System.out.println("Listening exception: " + exception.getMessage());
+	}
+
+	public void clientConnected(ConnectionToClient clientConnection) {
+		System.out.println("Client Connected");
+		try {
+			clientConnection.sendToClient("Hello there");
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.out.println("Couldn't send message to client");
 		}
-      }
-      // Send the result to the client.
-      try
-      {
-        arg1.sendToClient(r);
-      }
-      catch (IOException e)
-      {
-        return;
-      }
-      }
-      
-      }
-    }
+	}
 
-  public void listeningException(Throwable exception) 
-  {
-    running = false;
-    
-  }
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		GameServer server = new GameServer();
+		Database db = new Database();
+		Scanner scanner = new Scanner(System.in);
+		String input;
+		server.setDatabase(db);
+
+		try {
+			server.listen();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Server failed to listen");
+			e.printStackTrace();
+		}
+
+		System.out.println("Type 'close' to close the server and end the program.");
+
+		do {
+			input = scanner.nextLine();
+
+			if (input.equals("close"))
+				break;
+		} while (server.isRunning()); 
+		scanner.close();
+
+		if (input.equals("close")) {
+
+			try {
+				db.finish();
+				server.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Could not successfully close server");
+				e.printStackTrace();
+			}
+		}
+
+	}
   
   
 }

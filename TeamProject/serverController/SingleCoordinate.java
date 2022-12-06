@@ -7,6 +7,7 @@ import java.util.*;
 
 public class SingleCoordinate {
 	private boolean occupied;
+	private boolean firedAt = false;
 	protected int x;
 	protected int y;
 	private int coord_index;
@@ -46,6 +47,14 @@ public class SingleCoordinate {
 		return occupied;
 	}
 	
+	public void setFiredAt(boolean firedAt) {
+		this.firedAt = firedAt;
+	}
+	
+	public boolean isFired() {
+		return firedAt;
+	}
+	
 	public void setStatus(char status) {
 		this.status = status;
 	}
@@ -79,5 +88,6 @@ public class SingleCoordinate {
 	public String getshipType() {
 		return shipType;
 	}
+
 
 }

@@ -2,74 +2,60 @@ package ClientInterface;
 
 import java.awt.*;
 import javax.swing.*;
+
+import ClientCommunication.GameClient;
+
 import java.awt.event.*;
 import java.io.IOException;
 
-public class LoginControl implements ActionListener
-{
-  // Private data fields for the container and chat client.
-  private JPanel container;
-  private ChatClient client;
-  
-  // Constructor for the login controller.
-  public LoginControl(JPanel container, ChatClient client)
-  {
-    this.container = container;
-    this.client = client;
-  }
-  
-  // Handle button clicks.
-  public void actionPerformed(ActionEvent ae)
-  {
-    // Get the name of the button clicked.
-    String command = ae.getActionCommand();
+public class LoginControl implements ActionListener {
+	private GameClient client;
+	private JPanel container;
 
-    // The Cancel button takes the user back to the initial panel.
-    if (command == "Cancel")
-    {
-      CardLayout cardLayout = (CardLayout)container.getLayout();
-      cardLayout.show(container, "1");
-    }
+	public LoginControl(JPanel container, GameClient client) {
+		this.container = container;
+		this.client = client;
+	}
 
-    // The Submit button submits the login information to the server.
-    else if (command == "Submit")
-    {
-      // Get the username and password the user entered.
-      LoginPanel loginPanel = (LoginPanel)container.getComponent(1);
-      LoginData data = new LoginData(loginPanel.getUsername(), loginPanel.getPassword());
-      
-      // Check the validity of the information locally first.
-      if (data.getUsername().equals("") || data.getPassword().equals(""))
-      {
-        displayError("You must enter a username and password.");
-        return;
-      }
+	public void actionPerformed(ActionEvent ae) {
 
-      // Submit the login information to the server.
-      try
-      {
-        client.sendToServer(data);
-      }
-      catch (IOException e)
-      {
-        displayError("Error connecting to the server.");
-      }
-    }
-  }
+		String command = ae.getActionCommand();
 
-  // After the login is successful, set the User object and display the contacts screen.
-  public void loginSuccess()
-  {
-    LoginPanel loginPanel = (LoginPanel)container.getComponent(1);
-    
-    CardLayout cardLayout = (CardLayout)container.getLayout();
-    cardLayout.show(container, "4");
-  }
+		if (command == "Cancel") {
+			CardLayout cardLayout = (CardLayout)container.getLayout();
+			cardLayout.show(container, "1");
+		}
+		else if (command == "Submit") {
+			// Get the username and password the user entered.
+			LoginPanel loginPanel = (LoginPanel)container.getComponent(1);
+			LoginData data = new LoginData(loginPanel.getUsername(), loginPanel.getPassword());
 
-  // Method that displays a message in the error label.
-  public void displayError(String error)
-  {
-    LoginPanel loginPanel = (LoginPanel)container.getComponent(1);
-    loginPanel.setError(error);
-  }
+			// Check the validity of the information locally first.
+			if (data.getUsername().equals("") || data.getPassword().equals("")) {
+				displayError("You must enter a username and password.");
+				return;
+			}
+
+			try {
+				client.sendToServer(data);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("Data not sent");
+			}
+		}
+
+	}
+
+	public void loginSuccess() {
+		LoginPanel loginPanel = (LoginPanel)container.getComponent(1);
+
+		CardLayout cardLayout = (CardLayout)container.getLayout();
+		cardLayout.show(container, "4");
+	}
+
+	public void displayError(String error) {
+		LoginPanel loginPanel = (LoginPanel)container.getComponent(1);
+		loginPanel.setError(error);
+	}
 }
