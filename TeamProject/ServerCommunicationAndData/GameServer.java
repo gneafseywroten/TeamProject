@@ -83,41 +83,51 @@ public class GameServer extends AbstractServer {
 				onlinePlayers.add(user);
 
 			}
+			
+			
 			else {
 				result = "LoginError";
 				System.out.println("Client " + arg1.getId() + " failed to login\n");
 			}
-
+			
 			try {
 				arg1.sendToClient(result);
-				arg1.sendToClient("I am: " + data.getUsername());
-				int playersReady = onlinePlayers.size();
-				if (playersReady >= 2) {
-					player1 = onlinePlayers.get(0);
-					player2 = onlinePlayers.get(1);
-					conn1 = player1.getConnectionToClient();
-					conn2 = player2.getConnectionToClient();
-					player1_id = conn1.getId();
-					player2_id = conn2.getId();
-					p1_num = (int) player1_id;
-					p2_num = (int) player2_id;
-					String message1 = "Welcome, Player 1";
-					String message2 = "Welcome, Player 2";
-					try {
-						conn1.sendToClient(message1);
-						conn2.sendToClient(message2);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			} catch (IOException e) {
+				arg1.sendToClient("Hello " + data.getUsername());
+			} catch (IOException e1) {
 				// TODO Auto-generated catch block
-				System.out.print("Could not send login verification data to client");
-				e.printStackTrace();
+				e1.printStackTrace();
 			}
 
 		}
+		
+//		else if( )
+//		
+//		try {
+//			int playersReady = onlinePlayers.size();
+//			if (playersReady >= 2) {
+//				player1 = onlinePlayers.get(0);
+//				player2 = onlinePlayers.get(1);
+//				conn1 = player1.getConnectionToClient();
+//				conn2 = player2.getConnectionToClient();
+//				player1_id = conn1.getId();
+//				player2_id = conn2.getId();
+//				p1_num = (int) player1_id;
+//				p2_num = (int) player2_id;
+//				String message1 = "Welcome, Player 1";
+//				String message2 = "Welcome, Player 2";
+//				try {
+//					conn1.sendToClient(message1);
+//					conn2.sendToClient(message2);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			System.out.print("Could not send login verification data to client");
+//			e.printStackTrace();
+//		}
 
 		else if (arg0 instanceof CreateAccountData) {
 			System.out.println("This is an instance of CreateAccountData");
