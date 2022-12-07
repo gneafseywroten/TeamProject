@@ -21,6 +21,8 @@ public class GameServer extends AbstractServer {
 	private User player2;
 	private long player1_id;
 	private long player2_id;
+	private int p1_num;
+	private int p2_num;
 	private ConnectionToClient conn1;
 	private ConnectionToClient conn2;
 	private String message;
@@ -145,7 +147,7 @@ public class GameServer extends AbstractServer {
 		
 		else if (arg0 instanceof SingleCoordinate) {
 			long currentPlayer = arg1.getId();
-
+			
 			if (currentPlayer == player1_id) {
 				try {
 					conn2.sendToClient(arg0);
