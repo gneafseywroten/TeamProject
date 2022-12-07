@@ -3,12 +3,10 @@ package ServerCommunicationAndData;
 import java.io.*;
 import java.util.*;
 
-import ClientCommunication.StartNewGame;
 import ClientInterface.CreateAccountData;
 import ClientInterface.LoginData;
 import ClientInterface.ShotData;
 import ocsf.server.*;
-import serverController.Match;
 import serverController.SingleCoordinate;
 
 public class GameServer extends AbstractServer {
@@ -18,7 +16,7 @@ public class GameServer extends AbstractServer {
 	private User user;
 	private ArrayList<User> onlinePlayers = new ArrayList<User>();
 	private ArrayList<User> startedGames = new ArrayList<User>();
-	private Match match;
+	//private Match match;
 	private User player1;
 	private User player2;
 	private long player1_id;

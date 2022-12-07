@@ -2,6 +2,9 @@ package ClientInterface;
 
 import java.awt.*;
 import javax.swing.*;
+
+import ClientCommunication.GameClient;
+
 import java.awt.event.*;
 
 public class StartJoinGameControl implements ActionListener
@@ -25,7 +28,7 @@ public class StartJoinGameControl implements ActionListener
     
     if (command.equals("Start Game"))
     {
-      BattleshipBoardPanel boardPanel = (BattleshipBoardPanel)container.getComponent(1);
+      BattleshipBoardPanel boardPanel = (BattleshipBoardPanel)sj.getComponent(1);
       boardPanel.setError("");
       CardLayout cardLayout = (CardLayout)sj.getLayout();
       cardLayout.show(sj, "2");
@@ -35,7 +38,7 @@ public class StartJoinGameControl implements ActionListener
    
     else if (command.equals("Join Game"))
     {
-    	BattleshipBoardPanel boardPanel = (BattleshipBoardPanel)container.getComponent(2);
+    	BattleshipBoardPanel boardPanel = (BattleshipBoardPanel)sj.getComponent(2);
     	boardPanel.setError("");
       CardLayout cardLayout = (CardLayout)sj.getLayout();
       cardLayout.show(sj, "3");
