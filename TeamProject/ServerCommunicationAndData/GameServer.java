@@ -99,6 +99,8 @@ public class GameServer extends AbstractServer {
 					conn2 = player2.getConnectionToClient();
 					player1_id = conn1.getId();
 					player2_id = conn2.getId();
+					p1_num = (int) player1_id;
+					p2_num = (int) player2_id;
 					String message1 = "Welcome, Player 1";
 					String message2 = "Welcome, Player 2";
 					try {
@@ -147,8 +149,9 @@ public class GameServer extends AbstractServer {
 		
 		else if (arg0 instanceof SingleCoordinate) {
 			long currentPlayer = arg1.getId();
+			int currentPlayerNum = (int) currentPlayer;
 			
-			if (currentPlayer == player1_id) {
+			if (currentPlayerNum == p1_num) {
 				try {
 					conn2.sendToClient(arg0);
 				} catch (IOException e) {
@@ -157,7 +160,7 @@ public class GameServer extends AbstractServer {
 				}
 				
 			}
-			else if (currentPlayer == player2_id) {
+			else if (currentPlayerNum == p2_num) {
 				try {
 					conn1.sendToClient(arg0);
 				} catch (IOException e) {
@@ -170,8 +173,9 @@ public class GameServer extends AbstractServer {
 
 		else if (arg0 instanceof ArrayList) {
 			long currentPlayer = arg1.getId();
-
-			if (currentPlayer == player1_id) {
+			int currentPlayerNum = (int) currentPlayer;
+			
+			if (currentPlayerNum == p1_num) {
 				try {
 					conn2.sendToClient(arg0);
 				} catch (IOException e) {
@@ -179,9 +183,8 @@ public class GameServer extends AbstractServer {
 					e.printStackTrace();
 				}
 				
-				
 			}
-			else if (currentPlayer == player2_id) {
+			else if (currentPlayerNum == p2_num) {
 				try {
 					conn1.sendToClient(arg0);
 				} catch (IOException e) {
@@ -194,29 +197,33 @@ public class GameServer extends AbstractServer {
 
 		else if (arg0 instanceof ShotData) {
 			long currentPlayer = arg1.getId();
-
-			if (currentPlayer == player1_id) {
+			int currentPlayerNum = (int) currentPlayer;
+			
+			if (currentPlayerNum == p1_num) {
 				try {
 					conn2.sendToClient(arg0);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
 			}
-			else if (currentPlayer == player2_id) {
+			else if (currentPlayerNum == p2_num) {
 				try {
 					conn1.sendToClient(arg0);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
 			}
 		}
 		
 		else if (message.equals("YOU WIN!!!")) {
 			long currentPlayer = arg1.getId();
-
-			if (currentPlayer == player1_id) {
+			int currentPlayerNum = (int) currentPlayer;
+			
+			if (currentPlayerNum == p1_num) {
 				try {
 					conn2.sendToClient(arg0);
 				} catch (IOException e) {
@@ -229,7 +236,7 @@ public class GameServer extends AbstractServer {
 					System.out.println("Successfully updated database");
 				
 			}
-			else if (currentPlayer == player2_id) {
+			else if (currentPlayerNum == p2_num) {
 				try {
 					conn1.sendToClient(arg0);
 				} catch (IOException e) {
