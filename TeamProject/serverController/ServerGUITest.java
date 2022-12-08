@@ -35,9 +35,9 @@ public class ServerGUITest extends JFrame {
 		
 		oceanGrid = new GameBoard(playerData);
 		
-		playerGC = new GameController(playerData, oceanGrid);
-		oceanGrid.setGameController(playerGC);
-		oceanGrid.buildBoard();
+		//playerGC = new GameController(playerData, oceanGrid);
+		//oceanGrid.setGameController(playerGC);
+		//oceanGrid.buildBoard();
 		
 		//Create the view
 		//oceanGrid = new GameBoard(gc);

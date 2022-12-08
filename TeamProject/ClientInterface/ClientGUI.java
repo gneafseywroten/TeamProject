@@ -29,7 +29,8 @@ public class ClientGUI extends JFrame {
 
 		client.setLoginControl(lc);
 		client.setCreateAccountControl(cac);
-		BattleshipBoardController gameController = new BattleshipBoardController(data,gameBoard);
+		BattleshipBoardController gameController = new BattleshipBoardController(data,gameBoard,client);
+		client.setGameControl(gameController);
 		gameBoard.setBattleshipBoardController(gameController);
 		gameBoard.buildBoard();
 
@@ -68,7 +69,6 @@ public class ClientGUI extends JFrame {
 		//Instantiate client
 		GameClient client = new GameClient(host);
 
-		new ClientGUI(client);
 
 		//Open client connection
 		try {
@@ -78,6 +78,8 @@ public class ClientGUI extends JFrame {
 			e.printStackTrace();
 			System.out.println("Client could not connect");
 		}
+		
+		new ClientGUI(client);
 
 	}
 

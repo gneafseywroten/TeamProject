@@ -65,9 +65,10 @@ public class BattleshipBoardController {
 	private List<SingleCoordinate> tempShip = new ArrayList<>();
 	GameClient client;
 	
-	public BattleshipBoardController(BattleshipBoardData data, BattleshipBoardPanel gb) {
+	public BattleshipBoardController(BattleshipBoardData data, BattleshipBoardPanel gb, GameClient client) {
 		this.data = data;
 		this.gameBoard = gb;
+		this.client = client;
 		
 		//this.container = container;
 		//LoginData data = new LoginData(loginPanel.getUsername(), loginPanel.getPassword());
@@ -281,11 +282,12 @@ public class BattleshipBoardController {
 						    		}
 						    	}
 					    	}
-					    	playerSquaresSelected = true;
+					    	//playerSquaresSelected = true;
 					    }
 					    else {
 					    	gameBoard.setPlayerMessage("You must select a ship to place");
 					    }
+					  playerSquaresSelected = true;
 				  }
 			  }
 		});
@@ -609,6 +611,9 @@ public class BattleshipBoardController {
 		beginBattle.setEnabled(false);
 		beginBattle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				int i = 0;
+				int size = data.getPlayerCoordArraySize();
+				
 				ArrayList<SingleCoordinate> playerInfo = new ArrayList<SingleCoordinate>();
 				playerInfo = data.getAllPlayerCoords();
 				try {
@@ -617,6 +622,32 @@ public class BattleshipBoardController {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				
+//				for (i = 0; i < size; i++) {
+//					SingleCoordinate toSend = data.getPlayerCoordinate(i);
+//					int temp = toSend.getCoordIndex();
+//					System.out.println("Coord index: " + temp);
+//					try {
+//						client.sendToServer("Opponent ready for Battle");
+//						client.sendToServer(toSend);
+//					} catch (IOException e1) {
+//						// TODO Auto-generated catch block
+//						System.out.print("Could not send to server");
+//						e1.printStackTrace();
+//					}
+//				}
+				
+//				SingleCoordinate toSend = data.getPlayerCoordinate(i);
+//				int temp = toSend.getCoordIndex();
+//				System.out.println("Coord index: " + temp);
+//				try {
+//					client.sendToServer("Opponent ready for Battle");
+//					client.sendToServer(toSend);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					System.out.print("Could not send to server");
+//					e1.printStackTrace();
+//				}
 			}
 		});
 		return beginBattle;
@@ -816,6 +847,34 @@ public class BattleshipBoardController {
 			playerGridButton[fire_row][fire_col].setBackground(Color.WHITE);
 		}
 		data.changePlayerCoordinate(coord_index, fire_coord);
+	}
+	
+	public void parseHitString(String message) {
+		String[] arrOfStr = message.split("|");
+		String firedShip = arrOfStr[1];
+		System.out.println("Ship: " + firedShip);
+		int coord_index = Integer.parseInt(arrOfStr[2]);
+		System.out.println("Index: " + coord_index);
+		int shot_row = Integer.parseInt(arrOfStr[3]);
+		int shot_col = Integer.parseInt(arrOfStr[4]);
+		
+		playerGridButton[shot_row][shot_col].setText("X");
+		playerGridButton[shot_row][shot_col].setBackground(Color.RED);
+		
+		setPlayerMessage("Enemy has hit your " + firedShip);
+	}
+	
+	public void parseMissString(String message) {
+		String[] arrOfStr = message.split("|");
+		int coord_index = Integer.parseInt(arrOfStr[1]);
+		System.out.println("Index: " + coord_index);
+		int shot_row = Integer.parseInt(arrOfStr[2]);
+		int shot_col = Integer.parseInt(arrOfStr[3]);
+		
+		playerGridButton[shot_row][shot_col].setText("O");
+		playerGridButton[shot_row][shot_col].setBackground(Color.WHITE);
+		
+		setPlayerMessage("Enemy missed");
 	}
 		
 	public void gameWon() {

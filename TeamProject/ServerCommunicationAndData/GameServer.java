@@ -7,16 +7,19 @@ import ClientInterface.CreateAccountData;
 import ClientInterface.LoginData;
 import ClientInterface.ShotData;
 import ocsf.server.*;
+import serverController.GameController;
+import serverController.GameData;
 import serverController.SingleCoordinate;
 
 public class GameServer extends AbstractServer {
 	private boolean running = false;
 	private boolean listening = false;
 	private Database db;
+	private GameController gc;
+	private GameData gameData;
 	private User user;
 	private ArrayList<User> onlinePlayers = new ArrayList<User>();
-	private ArrayList<User> startedGames = new ArrayList<User>();
-	//private Match match;
+	//private ArrayList<User> startedGames = new ArrayList<User>();
 	private User player1;
 	private User player2;
 	private long player1_id;
@@ -29,11 +32,22 @@ public class GameServer extends AbstractServer {
 
 	public GameServer() {
 		super(8300);
-		this.setTimeout(500);
+		this.setTimeout(50000);
+		db = new Database();
+		gameData = new GameData();
+		gc = new GameController(gameData);
 	}
 
 	public void setDatabase(Database db) {
 		this.db = db;
+	}
+	
+	public void setGameData(GameData gameData) {
+		this.gameData = gameData;
+	}
+	
+	public void setGameController(GameController gc) {
+		this.gc = gc;
 	}
 
 	public void serverStarted() {
@@ -83,51 +97,41 @@ public class GameServer extends AbstractServer {
 				onlinePlayers.add(user);
 
 			}
-			
-			
 			else {
 				result = "LoginError";
 				System.out.println("Client " + arg1.getId() + " failed to login\n");
 			}
-			
+
 			try {
 				arg1.sendToClient(result);
-				arg1.sendToClient("Hello " + data.getUsername());
-			} catch (IOException e1) {
+				arg1.sendToClient("I am: " + data.getUsername());
+				int playersReady = onlinePlayers.size();
+				if (playersReady >= 2) {
+					player1 = onlinePlayers.get(0);
+					player2 = onlinePlayers.get(1);
+					conn1 = player1.getConnectionToClient();
+					conn2 = player2.getConnectionToClient();
+					player1_id = conn1.getId();
+					player2_id = conn2.getId();
+					p1_num = (int) player1_id;
+					p2_num = (int) player2_id;
+					String message1 = "Welcome, Player 1";
+					String message2 = "Welcome, Player 2";
+					try {
+						conn1.sendToClient(message1);
+						conn2.sendToClient(message2);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				System.out.print("Could not send login verification data to client");
+				e.printStackTrace();
 			}
 
 		}
-		
-//		else if( )
-//		
-//		try {
-//			int playersReady = onlinePlayers.size();
-//			if (playersReady >= 2) {
-//				player1 = onlinePlayers.get(0);
-//				player2 = onlinePlayers.get(1);
-//				conn1 = player1.getConnectionToClient();
-//				conn2 = player2.getConnectionToClient();
-//				player1_id = conn1.getId();
-//				player2_id = conn2.getId();
-//				p1_num = (int) player1_id;
-//				p2_num = (int) player2_id;
-//				String message1 = "Welcome, Player 1";
-//				String message2 = "Welcome, Player 2";
-//				try {
-//					conn1.sendToClient(message1);
-//					conn2.sendToClient(message2);
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			System.out.print("Could not send login verification data to client");
-//			e.printStackTrace();
-//		}
 
 		else if (arg0 instanceof CreateAccountData) {
 			System.out.println("This is an instance of CreateAccountData");
@@ -160,73 +164,104 @@ public class GameServer extends AbstractServer {
 		else if (arg0 instanceof SingleCoordinate) {
 			long currentPlayer = arg1.getId();
 			int currentPlayerNum = (int) currentPlayer;
+			SingleCoordinate coordToPass = (SingleCoordinate) arg0;
+			int indexToPass = coordToPass.getCoordIndex();
+			System.out.println("Storing coordinate " + indexToPass);
 			
 			if (currentPlayerNum == p1_num) {
-				try {
-					conn2.sendToClient(arg0);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+				gameData.addPlayer1Coordinate(indexToPass, coordToPass);
 			}
 			else if (currentPlayerNum == p2_num) {
-				try {
-					conn1.sendToClient(arg0);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+				gameData.addPlayer2Coordinate(indexToPass, coordToPass);
 			}
+			
+//			if (currentPlayerNum == p1_num) {
+//				try {
+//					conn2.sendToClient(arg0);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//			}
+//			else if (currentPlayerNum == p2_num) {
+//				try {
+//					conn1.sendToClient(arg0);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//			}
 		}
 
 		else if (arg0 instanceof ArrayList) {
 			long currentPlayer = arg1.getId();
 			int currentPlayerNum = (int) currentPlayer;
 			
+			ArrayList<SingleCoordinate> arrToPass = (ArrayList<SingleCoordinate>) arg0;
+			
 			if (currentPlayerNum == p1_num) {
-				try {
-					conn2.sendToClient(arg0);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+				gameData.setAllPlayer1Coords(arrToPass);
 			}
 			else if (currentPlayerNum == p2_num) {
-				try {
-					conn1.sendToClient(arg0);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+				gameData.setAllPlayer2Coords(arrToPass);
 			}
+//			if (currentPlayerNum == p1_num) {
+//				try {
+//					conn2.sendToClient(arg0);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//			}
+//			else if (currentPlayerNum == p2_num) {
+//				try {
+//					conn1.sendToClient(arg0);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//			}
 		}
 
 		else if (arg0 instanceof ShotData) {
 			long currentPlayer = arg1.getId();
 			int currentPlayerNum = (int) currentPlayer;
+			ShotData shot = (ShotData) arg0;
+			int shot_coord = shot.getIndex();
+			int shot_row = shot.getRow();
+			int shot_col = shot.getCol();
+			String shotResult;
 			
 			if (currentPlayerNum == p1_num) {
-				try {
-					conn2.sendToClient(arg0);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+				gc.p1FiresAtp2(shot_coord, shot_row, shot_col);
 			}
 			else if (currentPlayerNum == p2_num) {
-				try {
-					conn1.sendToClient(arg0);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+				gc.p2FiresAtp1(shot_coord, shot_row, shot_col);
 			}
+			
+			
+//			if (currentPlayerNum == p1_num) {
+//				try {
+//					conn2.sendToClient(arg0);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//			}
+//			else if (currentPlayerNum == p2_num) {
+//				try {
+//					conn1.sendToClient(arg0);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//			}
 		}
 		
 		else if (message.equals("YOU WIN!!!")) {
@@ -268,9 +303,10 @@ public class GameServer extends AbstractServer {
 	}
 
 	public void clientConnected(ConnectionToClient connectedClient) {
-		System.out.println("Client Connected");
+		System.out.println("Client " + connectedClient.getId() +  " Connected");
+		
 		try {
-			connectedClient.sendToClient("Hello there");
+			connectedClient.sendToClient("Hello there ");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -281,10 +317,8 @@ public class GameServer extends AbstractServer {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		GameServer server = new GameServer();
-		Database db = new Database();
 		Scanner scanner = new Scanner(System.in);
 		String input;
-		server.setDatabase(db);
 
 		try {
 			server.listen();
@@ -294,27 +328,27 @@ public class GameServer extends AbstractServer {
 			e.printStackTrace();
 		}
 
-		System.out.println("Type 'close' to close the server and end the program.");
-
-		do {
-			input = scanner.nextLine();
-
-			if (input.equals("close"))
-				break;
-		} while (server.isRunning()); 
-		scanner.close();
-
-		if (input.equals("close")) {
-
-			try {
-				db.finish();
-				server.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("Could not successfully close server");
-				e.printStackTrace();
-			}
-		}
+//		System.out.println("Type 'close' to close the server and end the program.");
+//
+//		do {
+//			input = scanner.nextLine();
+//
+//			if (input.equals("close"))
+//				break;
+//		} while (server.isRunning()); 
+//		scanner.close();
+//
+//		if (input.equals("close")) {
+//
+//			try {
+//				db.finish();
+//				server.close();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				System.out.println("Could not successfully close server");
+//				e.printStackTrace();
+//			}
+//		}
 
 	}
 

@@ -4,8 +4,9 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.Serializable;
 
-public class SingleCoordinate {
+public class SingleCoordinate implements Serializable {
 	private boolean occupied;
 	private boolean firedAt = false;
 	protected int x;

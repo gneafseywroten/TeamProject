@@ -11,7 +11,7 @@ public class Database {
 	private String url;
 	private String aeskey;
 	private FileInputStream fis;
-
+	
 	public Database() {
 		try {
 			fis = new FileInputStream("./serverCommunicationAndData/db.properties");
@@ -20,8 +20,7 @@ public class Database {
 			System.out.println("Could not find properties file");
 			e.printStackTrace();
 		}
-		System.out.println("Got properties file, now loading properties");
-
+		
 		Properties props = new Properties();
 		try {
 			props.load(fis);
@@ -34,17 +33,16 @@ public class Database {
 		password = props.getProperty("password");
 		url = props.getProperty("url");
 		aeskey = props.getProperty("aeskey");
-
+		
 		try {
 			conn = DriverManager.getConnection(url, username, password);
-			System.out.println("Connection to database established");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Could not establish connection to database");
 			e.printStackTrace();
 		}
 	}
-
+	
 	public ResultSet query(String query) {
 		try {
 			Statement stmt = conn.createStatement();
@@ -57,7 +55,7 @@ public class Database {
 			return null;
 		}
 	}
-
+	
 	public boolean executeDML(String dml) {
 		Statement stmt;
 		System.out.println("Readying to execute query");
@@ -75,14 +73,14 @@ public class Database {
 			return false;
 		}
 	}
-
+	
 	public boolean createAccount(String username, String password) {
 		String dml = "INSERT INTO users VALUES('"+username+"',aes_encrypt('"+password+"','"+aeskey+"'),0);";
 		System.out.println("Outgoing query to create account");
 		boolean executed = executeDML(dml);
 		return executed;
 	}
-
+	
 	public boolean verifyAccount(String username, String password) {
 		ResultSet results = query("SELECT * FROM users WHERE username='"+username+"' AND password=aes_encrypt('"+password+"','"+aeskey+"');");
 		try {
@@ -100,7 +98,7 @@ public class Database {
 		boolean executed = executeDML(dml);
 		return executed;
 	}
-
+	
 	public boolean finish() {
 		try {
 			conn.close();

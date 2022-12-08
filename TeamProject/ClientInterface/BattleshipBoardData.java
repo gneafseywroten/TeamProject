@@ -1,6 +1,5 @@
 package ClientInterface;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -166,6 +165,10 @@ public class BattleshipBoardData {
 	
 	public ArrayList<SingleCoordinate> getAllEnemyCoords() {
 		return enemyCoords;
+	}
+	
+	public int getPlayerCoordArraySize() {
+		return playerCoords.size();
 	}
 
 }

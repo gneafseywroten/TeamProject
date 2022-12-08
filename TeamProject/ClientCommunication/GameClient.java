@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ClientInterface.BattleshipBoardController;
 import ClientInterface.CreateAccountControl;
 import ClientInterface.LoginControl;
+import ClientInterface.ShotData;
 import ServerCommunicationAndData.User;
 import ocsf.client.AbstractClient;
 import serverController.SingleCoordinate;
@@ -63,16 +64,32 @@ public class GameClient extends AbstractClient {
 				createAccountControl.displayError("Account could not be created");
 			}
 			else if (message.startsWith("Welcome, ")) {
+				System.out.println(message);
 				gameControl.setPlayerMessage(message);
 			}
+			else if (message.startsWith("Enemy hit ")) {
+				gameControl.parseHitString(message);
+			}
+			else if (message.startsWith("Enemy missed ")) {
+				gameControl.parseMissString(message);
+			}
 			else if (arg0 instanceof SingleCoordinate) {
+				System.out.println("Received Coordinate");
 				gameControl.receiveEnemyCoordinate((SingleCoordinate) arg0);
 			}
 			else if (arg0 instanceof ArrayList) {
+				System.out.println("Received Arraylist");
 				gameControl.setEnemyCoordinates((ArrayList<SingleCoordinate>) arg0);
 			}
 			else if (message.equals("YOU WIN!!!")) {
 				gameControl.gameWon();
+			}
+			else if (message.equals("Hello there ")) {
+				System.out.println(message);
+			}
+			else if (arg0 instanceof ShotData) {
+				System.out.println("Received Shot");
+				gameControl.receiveFire((ShotData) arg0);
 			}
 			
 			//System.out.println("Message received from server:" + message);
