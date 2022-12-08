@@ -1,6 +1,8 @@
 package ClientInterface;
 
-public class ShotData {
+import java.io.Serializable;
+
+public class ShotData implements Serializable{
 	private int row;
 	private int col;
 	private int index;
