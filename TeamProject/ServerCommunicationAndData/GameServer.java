@@ -234,13 +234,40 @@ public class GameServer extends AbstractServer {
 			int shot_coord = shot.getIndex();
 			int shot_row = shot.getRow();
 			int shot_col = shot.getCol();
-			String shotResult;
+			String playerWhoShot = "no shots yet";
+			String playerFiredAt = "not fired at yet";
 			
 			if (currentPlayerNum == p1_num) {
-				gc.p1FiresAtp2(shot_coord, shot_row, shot_col);
+				System.out.println("Processing Player1 hit to Player 2");
+				playerFiredAt = gc.p1FiresAtp2(shot_coord, shot_row, shot_col);
+				if (playerFiredAt.startsWith("Enemy hit") || playerFiredAt.equals("Defeated"))
+					playerWhoShot = gc.getOpponentHit();
+				else if (playerFiredAt.startsWith("Enemy missed"))
+					playerWhoShot = gc.getOpponentMiss();
+				
+				try {
+					conn1.sendToClient(playerWhoShot);
+					conn2.sendToClient(playerFiredAt);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			else if (currentPlayerNum == p2_num) {
-				gc.p2FiresAtp1(shot_coord, shot_row, shot_col);
+				System.out.println("Processing Player2 hit to Player 1");
+				playerFiredAt = gc.p2FiresAtp1(shot_coord, shot_row, shot_col);
+				if (playerFiredAt.startsWith("Enemy hit") || playerFiredAt.equals("Defeated"))
+					playerWhoShot = gc.getOpponentHit();
+				else if (playerFiredAt.startsWith("Enemy missed"))
+					playerWhoShot = gc.getOpponentMiss();
+				
+				try {
+					conn1.sendToClient(playerFiredAt);
+					conn2.sendToClient(playerWhoShot);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 			

@@ -55,6 +55,8 @@ public class GameController {
 	private List<Integer> shipCoords = new ArrayList<>();
 	private List<Integer> firedAt = new ArrayList<>();
 	private List<SingleCoordinate> tempShip = new ArrayList<>();
+	private String opponentHit;
+	private String opponentMiss;
 	
 	public GameController(GameData data) {
 		this.data = data;
@@ -108,14 +110,16 @@ public class GameController {
 			else {
 				fire_coord = new SingleCoordinate(coord_index,true,'h');
 			}
-			boolean win = data.player2Won();
-			if(win) {
-				message = "YOU WIN!!!";
+			boolean defeat = data.player2Defeated();
+			if(defeat) {
+				message = "Defeated";
 			}
+			alertOpponentOfHit(coord_index,shot_row,shot_col, defeat);
 		}
 		else {
 			message = "Enemy missed |" + coord_index + "|" + shot_row + "|" + shot_col;
 			fire_coord = new SingleCoordinate(coord_index, false, 'm');
+			alertOpponentOfMiss(coord_index,shot_row,shot_col);
 		}
 		data.changePlayer2Coordinate(coord_index, fire_coord);
 		
@@ -169,18 +173,38 @@ public class GameController {
 			else {
 				fire_coord = new SingleCoordinate(coord_index,true,'h');
 			}
-			boolean win = data.player2Won();
-			if(win) {
-				message = "YOU WIN!!!";
+			boolean defeat = data.player1Defeated();
+			if(defeat) {
+				message = "Defeated";
 			}
+			alertOpponentOfHit(coord_index, shot_row, shot_col, defeat);
 		}
 		else {
 			message = "Enemy missed |" + coord_index + "|" + shot_row + "|" + shot_col;
 			fire_coord = new SingleCoordinate(coord_index, false, 'm');
+			alertOpponentOfMiss(coord_index, shot_row, shot_col);
 		}
 		data.changePlayer1Coordinate(coord_index, fire_coord);
 		
 		return message;
 	}
 	
+	public void alertOpponentOfHit(int coord_index, int shot_row, int shot_col, boolean win) {
+		if(win)
+			opponentHit = "YOU WIN!!!";
+		else
+			opponentHit = ("Hit!" + "|" + coord_index + "|" + shot_row + "|" + shot_col);
+	}
+	
+	public void alertOpponentOfMiss(int coord_index, int shot_row, int shot_col) {
+		opponentMiss = "Miss" + "|" + coord_index + "|" + "|" + shot_row + "|" + shot_col;
+	}
+	
+	public String getOpponentHit() {
+		return opponentHit;
+	}
+	
+	public String getOpponentMiss() {
+		return opponentMiss;
+	}
 }

@@ -14,6 +14,8 @@ public class GameData {
 	//private boolean placementValid;
 	private boolean p1_win = false;
 	private boolean p2_win = false;
+	private boolean p1_defeat = false;
+	private boolean p2_defeat = false;
 	private int shipLength = 1;
 	private int shipIndex;
 	private int[] shipPlaced = {0,0,0,0,0};
@@ -141,14 +143,20 @@ public class GameData {
 	
 	public void addP1ShipSunk() {
 		p1ShipsSunk++;
-		if (p1ShipsSunk == 5)
+		if (p1ShipsSunk == 5) {
 			this.p2_win = true;
+			this.p1_defeat = true;
+		}
+			
 	}
 	
 	public void addP2ShipSunk() {
 		p2ShipsSunk++;
-		if (p2ShipsSunk == 5)
+		if (p2ShipsSunk == 5) {
 			this.p1_win = true;
+			this.p2_defeat = true;
+		}
+			
 	}
 	
 	public boolean player1Won() {
@@ -157,6 +165,14 @@ public class GameData {
 	
 	public boolean player2Won() {
 		return p2_win;
+	}
+	
+	public boolean player1Defeated() {
+		return p1_defeat;
+	}
+	
+	public boolean player2Defeated() {
+		return p2_defeat;
 	}
 	
 	public int getP1ShipsSunk() {

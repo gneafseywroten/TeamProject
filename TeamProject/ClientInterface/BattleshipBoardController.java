@@ -849,7 +849,7 @@ public class BattleshipBoardController {
 		data.changePlayerCoordinate(coord_index, fire_coord);
 	}
 	
-	public void parseHitString(String message) {
+	public void parsePlayerHitString(String message) {
 		String[] arrOfStr = message.split("|");
 		String firedShip = arrOfStr[1];
 		System.out.println("Ship: " + firedShip);
@@ -861,10 +861,10 @@ public class BattleshipBoardController {
 		playerGridButton[shot_row][shot_col].setText("X");
 		playerGridButton[shot_row][shot_col].setBackground(Color.RED);
 		
-		setPlayerMessage("Enemy has hit your " + firedShip);
+		setPlayerMessage("Enemy hit your " + firedShip);
 	}
 	
-	public void parseMissString(String message) {
+	public void parsePlayerMissString(String message) {
 		String[] arrOfStr = message.split("|");
 		int coord_index = Integer.parseInt(arrOfStr[1]);
 		System.out.println("Index: " + coord_index);
@@ -875,6 +875,30 @@ public class BattleshipBoardController {
 		playerGridButton[shot_row][shot_col].setBackground(Color.WHITE);
 		
 		setPlayerMessage("Enemy missed");
+	}
+	
+	public void parseEnemyHitString(String message) {
+		String[] arrOfStr = message.split("|");
+		int coord_index = Integer.parseInt(arrOfStr[1]);
+		int shot_row = Integer.parseInt(arrOfStr[2]);
+		int shot_col = Integer.parseInt(arrOfStr[3]);
+		
+		enemyGridButton[shot_row][shot_col].setText("X");
+		enemyGridButton[shot_row][shot_col].setBackground(Color.RED);
+		
+		setEnemyMessage("Hit!");
+	}
+	
+	public void parseEnemyMissString(String message) {
+		String[] arrOfStr = message.split("|");
+		int coord_index = Integer.parseInt(arrOfStr[1]);
+		int shot_row = Integer.parseInt(arrOfStr[2]);
+		int shot_col = Integer.parseInt(arrOfStr[3]);
+		
+		enemyGridButton[shot_row][shot_col].setText("O");
+		enemyGridButton[shot_row][shot_col].setBackground(Color.WHITE);
+		
+		setEnemyMessage("Miss");
 	}
 		
 	public void gameWon() {

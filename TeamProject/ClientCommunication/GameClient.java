@@ -68,10 +68,22 @@ public class GameClient extends AbstractClient {
 				gameControl.setPlayerMessage(message);
 			}
 			else if (message.startsWith("Enemy hit ")) {
-				gameControl.parseHitString(message);
+				gameControl.parsePlayerHitString(message);
 			}
 			else if (message.startsWith("Enemy missed ")) {
-				gameControl.parseMissString(message);
+				gameControl.parsePlayerMissString(message);
+			}
+			else if (message.startsWith("Hit!")) {
+				
+			}
+			else if (message.startsWith("Miss")) {
+				
+			}
+			else if (message.equals("Defeated")) {
+				
+			}
+			else if (message.equals("YOU WIN!!!")) {
+				gameControl.gameWon();
 			}
 			else if (arg0 instanceof SingleCoordinate) {
 				System.out.println("Received Coordinate");
@@ -80,9 +92,6 @@ public class GameClient extends AbstractClient {
 			else if (arg0 instanceof ArrayList) {
 				System.out.println("Received Arraylist");
 				gameControl.setEnemyCoordinates((ArrayList<SingleCoordinate>) arg0);
-			}
-			else if (message.equals("YOU WIN!!!")) {
-				gameControl.gameWon();
 			}
 			else if (message.equals("Hello there ")) {
 				System.out.println(message);
