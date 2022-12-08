@@ -252,6 +252,9 @@ public class GameServer extends AbstractServer {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				if(playerWhoShot.equals("YOU WIN!!!"))
+					db.gameWon(player1.getUsername());
 			}
 			else if (currentPlayerNum == p2_num) {
 				System.out.println("Processing Player2 hit to Player 1");
@@ -268,7 +271,11 @@ public class GameServer extends AbstractServer {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				if(playerWhoShot.equals("YOU WIN!!!"))
+					db.gameWon(player2.getUsername());
 			}
+			
 			
 			
 //			if (currentPlayerNum == p1_num) {

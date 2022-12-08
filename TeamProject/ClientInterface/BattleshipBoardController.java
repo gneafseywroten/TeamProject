@@ -720,20 +720,20 @@ public class BattleshipBoardController {
 						double row = (coord_index - column) / (double)M_GRID_SIZE;
 						int fire_col = (int)column;
 						int fire_row = (int)row;
-						boolean occupied = fire_coord.isOccupied();
-						if (occupied) {
-							enemyMessage = "It's a hit!";
-							gameBoard.setEnemyMessage(enemyMessage);
-							enemyGridButton[fire_row][fire_col].setText("X");
-							enemyGridButton[fire_row][fire_col].setBackground(Color.RED);
-						}
-						else {
-							fire_coord = new SingleCoordinate(coord_index,true,'m');
-							enemyMessage = "It's a miss";
-							gameBoard.setEnemyMessage(enemyMessage);
-							enemyGridButton[fire_row][fire_col].setText("O");
-							enemyGridButton[fire_row][fire_col].setBackground(Color.WHITE);
-						}
+//						boolean occupied = fire_coord.isOccupied();
+//						if (occupied) {
+//							enemyMessage = "It's a hit!";
+//							gameBoard.setEnemyMessage(enemyMessage);
+//							enemyGridButton[fire_row][fire_col].setText("X");
+//							enemyGridButton[fire_row][fire_col].setBackground(Color.RED);
+//						}
+//						else {
+//							fire_coord = new SingleCoordinate(coord_index,true,'m');
+//							enemyMessage = "It's a miss";
+//							gameBoard.setEnemyMessage(enemyMessage);
+//							enemyGridButton[fire_row][fire_col].setText("O");
+//							enemyGridButton[fire_row][fire_col].setBackground(Color.WHITE);
+//						}
 						fire_coord.setFiredAt(true);
 						data.changeEnemyCoordinate(coord_index, fire_coord);
 						firedAt.add(coord_index);
@@ -898,6 +898,10 @@ public class BattleshipBoardController {
 		enemyGridButton[shot_row][shot_col].setText("O");
 		enemyGridButton[shot_row][shot_col].setBackground(Color.WHITE);
 		
+		SingleCoordinate fire_coord = data.getEnemyCoordinate(coord_index);
+		fire_coord.setFiredAt(true);
+		data.changeEnemyCoordinate(coord_index, fire_coord);
+		
 		setEnemyMessage("Miss");
 	}
 		
@@ -905,6 +909,11 @@ public class BattleshipBoardController {
 		String message = "YOU WIN!!!";
 		gameBoard.setPlayerMessage(message);
 		gameBoard.setEnemyMessage(message);
+	}
+	
+	public void gameLost() {
+		gameBoard.setPlayerMessage("Defeated");
+		gameBoard.setEnemyMessage("Defeated");
 	}
 	
 	public void setPlayerMessage(String message) {

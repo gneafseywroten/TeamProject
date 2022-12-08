@@ -74,10 +74,10 @@ public class GameClient extends AbstractClient {
 				gameControl.parsePlayerMissString(message);
 			}
 			else if (message.startsWith("Hit!")) {
-				
+				gameControl.parseEnemyHitString(message);
 			}
 			else if (message.startsWith("Miss")) {
-				
+				gameControl.parseEnemyMissString(message);
 			}
 			else if (message.equals("Defeated")) {
 				
